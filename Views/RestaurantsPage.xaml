@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FastTrak.Views.RestaurantsPage"
+             Title="RestaurantsPage">
+    <VerticalStackLayout Padding="16" Spacing="12">
+
+        <Label Text="Choose a restaurant"
+               FontSize="22"
+               FontAttributes="Bold"
+               TextColor="{StaticResource TextPrimaryColor}" />
+
+        <!-- Card-style list of restaurants -->
+        <CollectionView ItemsSource="{Binding Restaurants}"
+                        SelectedItem="{Binding SelectedRestaurant, Mode=TwoWay}"
+                        SelectionMode="Single">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+
+                    <Frame Padding="16"
+                           Margin="0,6"
+                           BackgroundColor="{StaticResource SurfaceColor}"
+                           CornerRadius="18"
+                           HasShadow="False">
+
+                        <Label Text="{Binding Name}"
+                               FontSize="18"
+                               TextColor="{StaticResource TextPrimaryColor}" />
+
+                    </Frame>
+
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+        <!-- Action button -->
+        <Button Text="View Menu"
+                FontSize="18"
+                Command="{Binding SelectRestaurantCommand}" />
+
+    </VerticalStackLayout>
+
+</ContentPage>

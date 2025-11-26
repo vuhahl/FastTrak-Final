@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using FastTrak.Data;
+using Microsoft.Extensions.Logging;
 
 namespace FastTrak
 {
@@ -7,6 +8,7 @@ namespace FastTrak
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
+
             builder
                 .UseMauiApp<App>()
                 .ConfigureFonts(fonts =>
@@ -15,11 +17,15 @@ namespace FastTrak
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 });
 
-#if DEBUG
-    		builder.Logging.AddDebug();
-#endif
+            // Repository
+            builder.Services.AddSingleton<NutritionRepository>();
+
+            // ViewModels
+            builder.Services.AddTransient<RestaurantsViewModel>();
+
+            // Pages
+            builder.Services.AddTransient<RestaurantsPage>();
 
             return builder.Build();
         }
-    }
 }
