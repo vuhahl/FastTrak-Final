@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FastTrak.Views.MenuItemsPage"
+             Title="MenuItemsPage">
+    <VerticalStackLayout Padding="16" Spacing="14">
+
+        <!-- Header displaying Restaurant Name -->
+        <Label Text="{Binding RestaurantName}"
+               FontSize="26"
+               FontAttributes="Bold"
+               TextColor="{StaticResource PrimaryColor}" />
+
+        <!-- Menu list -->
+        <CollectionView ItemsSource="{Binding MenuItems}"
+                        SelectionMode="Single"
+                        SelectedItem="{Binding SelectedMenuItem, Mode=TwoWay}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+
+                    <Frame Padding="14"
+                           Margin="0,8"
+                           CornerRadius="18"
+                           BackgroundColor="{StaticResource SurfaceColor}"
+                           HasShadow="False">
+
+                        <HorizontalStackLayout>
+                            <Label Text="{Binding Name}"
+                                   FontSize="18"
+                                   TextColor="{StaticResource TextPrimaryColor}"
+                                   VerticalOptions="Center" />
+
+                            <Label Text="{Binding Calories, StringFormat=' {0} kcal'}"
+                                   FontSize="15"
+                                   TextColor="{StaticResource InfoColor}"
+                                   HorizontalOptions="End"
+                                   VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+
+                    </Frame>
+
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Button to proceed -->
+        <Button Text="Customize"
+                FontSize="18"
+                Command="{Binding SelectMenuItemCommand}" />
+
+    </VerticalStackLayout>
+</ContentPage>

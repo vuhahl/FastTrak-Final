@@ -1,15 +1,42 @@
-<?xml version="1.0" encoding="UTF-8" ?>
 <Shell
     x:Class="FastTrak.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:FastTrak"
+    xmlns:views="clr-namespace:FastTrak.Views"
     Shell.FlyoutBehavior="Disabled"
     Title="FastTrak">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:HomePage}"
-        Route="HomePage" />
+    <TabBar>
+
+        <!-- HOME SCREEN -->
+        <ShellContent
+            Title="Home"
+            ContentTemplate="{DataTemplate views:HomePage}"
+            Route="HomePage" />
+
+        <!-- RESTAURANTS PAGE -->
+        <ShellContent
+            Title="Restaurants"
+            ContentTemplate="{DataTemplate views:RestaurantsPage}"
+            Route="RestaurantsPage" />
+
+        <!-- MENU ITEMS PAGE (not a tab, but must be registered) -->
+        <!-- We DO NOT place this in TabBar because it's a detail page -->
+
+        <!-- CALCULATOR PAGE 
+        <ShellContent
+            Title="Calculator"
+            ContentTemplate="{DataTemplate views:CalculatorPage}"
+            Route="CalculatorPage" />
+
+         ABOUT PAGE 
+        <ShellContent
+            Title="About"
+            ContentTemplate="{DataTemplate views:AboutPage}"
+            Route="AboutPage" />
+        
+        -->
+
+    </TabBar>
 
 </Shell>

@@ -1,12 +1,12 @@
-﻿namespace FastTrak
-{
-    public partial class App : Application
-    {
-        public App()
-        {
-            InitializeComponent();
+﻿using FastTrak.Data;
+namespace FastTrak;
 
-            MainPage = new AppShell();
-        }
+public partial class App : Application
+{
+    public App(NutritionRepository repo)
+    {
+        InitializeComponent();
+        MainPage = new AppShell();
+        Task.Run(async () => await repo.InitializeAsync());
     }
 }

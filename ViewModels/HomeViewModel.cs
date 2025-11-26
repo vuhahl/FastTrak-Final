@@ -6,19 +6,17 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FastTrak.Data;
+using FastTrak.Views;
 
 namespace FastTrak.ViewModels
-
-/// Loads today's log count and handles navigation buttons.
 {
-    public partial class HomeViewModel: ObservableObject
+    /// <summary>
+    /// Loads today's log count and handles navigation buttons.
+    /// </summary>
+    public partial class HomeViewModel : ObservableObject
     {
         private readonly NutritionRepository _repository;
 
-        /// <summary>
-        /// Number of items the user logged today.
-        /// Bound to the card displaying "X items logged".
-        /// </summary>
         [ObservableProperty]
         private int todayItemCount;
 
@@ -27,26 +25,17 @@ namespace FastTrak.ViewModels
             _repository = repo;
         }
 
-        /// <summary>
-        /// Loads fresh daily data every time the page appears.
-        /// </summary>
         public async Task LoadAsync()
         {
             TodayItemCount = await _repository.GetTodaySelectionCountAsync();
         }
 
-        /// <summary>
-        /// Navigate to the Restaurants tab.
-        /// </summary>
         [RelayCommand]
         private Task GoToRestaurantsAsync()
         {
             return Shell.Current.GoToAsync("//RestaurantsPage");
         }
 
-        /// <summary>
-        /// Navigate to the Nutritionix cloud search screen.
-        /// </summary>
         [RelayCommand]
         private Task GoToNutritionixSearchAsync()
         {
@@ -54,3 +43,4 @@ namespace FastTrak.ViewModels
         }
     }
 }
+
