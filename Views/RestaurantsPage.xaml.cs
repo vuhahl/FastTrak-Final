@@ -17,4 +17,10 @@ public partial class RestaurantsPage : ContentPage
         base.OnAppearing();
         await ViewModel.LoadAsync();
     }
+
+    private async void CollectionView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (BindingContext is RestaurantsViewModel vm)
+            await vm.SelectRestaurantCommand.ExecuteAsync(null);
+    }
 }

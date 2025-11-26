@@ -30,12 +30,20 @@ namespace FastTrak.Data
             await _db.CreateTableAsync<Restaurant>();
             await _db.CreateTableAsync<MenuItem>();
             await _db.CreateTableAsync<LoggedItem>();
+            await _db.CreateTableAsync<CustomOption>();
+            await _db.CreateTableAsync<LoggedItemOption>();
+            await _db.CreateTableAsync<MenuItemOption>();
 
             // Seed base restaurant list
             await SeedRestaurantsAsync();
 
             // Seed menu items from MenuItemSeedData.cs
             await SeedMenuItemsAsync();
+
+            await SeedRestaurantsAsync();
+            await SeedMenuItemsAsync();
+            await SeedCustomOptionsAsync();
+            await SeedMenuItemOptionsAsync();
         }
 
         /// <summary>
@@ -69,6 +77,30 @@ namespace FastTrak.Data
             var items = MenuItemSeedData.CreateMenuItems();
             await _db.InsertAllAsync(items);
         }
+
+        private async Task SeedCustomOptionsAsync()
+        {
+            if (await _db.Table<CustomOption>().CountAsync() > 0)
+                return;
+
+            var options = CustomOptionSeedData.CreateOptions();
+            await _db.InsertAllAsync(options);
+        }
+
+        private async Task SeedMenuItemOptionsAsync()
+        {
+            if (await _db.Table<MenuItemOption>().CountAsync() > 0)
+                return;
+
+            var items = await _db.Table<MenuItem>().ToListAsync();
+            var options = await _db.Table<CustomOption>().ToListAsync();
+
+            var links = MenuItemOptionSeedData.CreateLinks(items, options);
+
+            await _db.InsertAllAsync(links);
+        }
+
+
 
         // =============================
         //     DATA-RETRIEVAL METHODS

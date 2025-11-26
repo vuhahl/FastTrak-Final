@@ -12,8 +12,9 @@
 
         <!-- Card-style list of restaurants -->
         <CollectionView ItemsSource="{Binding Restaurants}"
-                        SelectedItem="{Binding SelectedRestaurant, Mode=TwoWay}"
-                        SelectionMode="Single">
+                SelectionMode="Single"
+                SelectedItem="{Binding SelectedRestaurant, Mode=TwoWay}"
+                SelectionChanged="CollectionView_SelectionChanged">
 
             <CollectionView.ItemTemplate>
                 <DataTemplate>
