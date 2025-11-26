@@ -54,6 +54,14 @@ namespace FastTrak.Data
                       .OrderBy(r => r.Name)
                       .ToListAsync();
         }
+
+        public Task<int> GetTodaySelectionCountAsync()
+        {
+            var today = DateTime.Today;
+            return _db.Table<LoggedItem>()
+                      .Where(x => x.LoggedAt >= today)
+                      .CountAsync();
+        }
     }
 }
 }

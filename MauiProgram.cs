@@ -1,4 +1,5 @@
 ﻿using FastTrak.Data;
+using FastTrak.Views;
 using Microsoft.Extensions.Logging;
 
 namespace FastTrak
@@ -25,6 +26,11 @@ namespace FastTrak
 
             // Pages
             builder.Services.AddTransient<RestaurantsPage>();
+
+            builder.Services.AddSingleton<NutritionRepository>();
+
+            builder.Services.AddTransient<HomeViewModel>();
+            builder.Services.AddTransient<HomePage>();
 
             return builder.Build();
         }

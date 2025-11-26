@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FastTrak.Views.HomePage"
+             Title="HomePage">
+    <Grid RowDefinitions="Auto, Auto, Auto, Auto"
+          Padding="24"
+          RowSpacing="20">
+
+        <!-- App Title -->
+        <VerticalStackLayout Grid.Row="0" Spacing="4">
+            <Label Text="FastTrak"
+                   FontSize="36"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource PrimaryColor}" />
+
+            <Label Text="Track fast-food nutrition in seconds."
+                   FontSize="15"
+                   TextColor="{StaticResource TextSecondaryColor}" />
+        </VerticalStackLayout>
+
+        <!-- Daily Log Card -->
+        <Frame Grid.Row="1"
+               Padding="18"
+               BackgroundColor="{StaticResource SurfaceColor}"
+               CornerRadius="18"
+               HasShadow="False">
+            <VerticalStackLayout Spacing="6">
+
+                <Label Text="Today's Log"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource TextPrimaryColor}" />
+
+                <Label Text="{Binding TodayItemCount, StringFormat='{0} items logged'}"
+                       FontSize="15"
+                       TextColor="{StaticResource InfoColor}" />
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Browse Restaurants -->
+        <Button Grid.Row="2"
+                Text="Browse Restaurants"
+                FontSize="18"
+                Padding="14"
+                Command="{Binding GoToRestaurantsCommand}" />
+
+        <!-- Nutritionix Search -->
+        <Button Grid.Row="3"
+                Text="Search with Nutritionix"
+                BackgroundColor="{StaticResource InfoColor}"
+                TextColor="White"
+                FontSize="18"
+                Padding="14"
+                Command="{Binding GoToNutritionixSearchCommand}" />
+
+    </Grid>
+
+</ContentPage>
