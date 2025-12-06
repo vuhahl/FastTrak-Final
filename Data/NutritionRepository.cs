@@ -1,11 +1,12 @@
-﻿using System;
+﻿using FastTrak.Data.Seeds;
+using FastTrak.Models;
+using Microsoft.Maui.Graphics;
+using SQLite;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FastTrak.Models;
-using SQLite;
-using FastTrak.Data.Seeds;
 using MenuItem = FastTrak.Models.MenuItem;
 
 namespace FastTrak.Data
@@ -129,6 +130,8 @@ namespace FastTrak.Data
                       .OrderBy(m => m.Name)
                       .ToListAsync();
         }
+        public Task<MenuItem> GetMenuItemAsync(int id) =>
+    _db.Table<MenuItem>().FirstAsync(m => m.Id == id);
 
         public Task<int> InsertLoggedItemAsync(LoggedItem item)
         {
@@ -144,6 +147,30 @@ namespace FastTrak.Data
                       .OrderBy(x => x.LoggedAt)
                       .ToListAsync();
         }
+
+        // get the custom options for a given menu item
+        public async Task<List<CustomOption>> GetCustomOptionsForMenuItemAsync(int menuItemId)
+        {
+            var links = await _db.Table<MenuItemOption>()
+                                 .Where(l => l.MenuItemId == menuItemId)
+                                 .ToListAsync();
+
+            var optionIds = links.Select(l => l.CustomOptionId).ToList();
+
+            return await _db.Table<CustomOption>()
+                            .Where(o => optionIds.Contains(o.Id))
+                            .ToListAsync();
+        }
+
+        //Insert option logs
+        public Task<int> InsertLoggedItemOptionAsync(int loggedItemId, int optionId) =>
+    _db.InsertAsync(new LoggedItemOption
+    {
+        LoggedItemId = loggedItemId,
+        CustomOptionId = optionId
+    });
+
+
 
         public async Task ClearTodayAsync()
         {

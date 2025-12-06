@@ -1,15 +1,16 @@
 namespace FastTrak.Views;
+
+using FastTrak.Models;
 using FastTrak.ViewModels;
 
 public partial class RestaurantsPage : ContentPage
 {
-    public RestaurantsViewModel ViewModel { get; }
+    private RestaurantsViewModel ViewModel => (RestaurantsViewModel)BindingContext;
 
     public RestaurantsPage(RestaurantsViewModel vm)
     {
         InitializeComponent();
         BindingContext = vm;
-        ViewModel = vm;
     }
 
     protected override async void OnAppearing()
@@ -18,9 +19,16 @@ public partial class RestaurantsPage : ContentPage
         await ViewModel.LoadAsync();
     }
 
-    private async void CollectionView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void RestaurantsCollectionView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (BindingContext is RestaurantsViewModel vm)
-            await vm.SelectRestaurantCommand.ExecuteAsync(null);
+        var selected = e.CurrentSelection.FirstOrDefault() as Restaurant;
+        if (selected == null)
+            return;
+
+        // Fire the VM command with the selected restaurant
+        ViewModel.SelectRestaurantCommand.Execute(selected);
+
+        // Clear selection so taps feel responsive
+        ((CollectionView)sender).SelectedItem = null;
     }
 }

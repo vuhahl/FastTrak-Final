@@ -2,45 +2,37 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="FastTrak.Views.RestaurantsPage"
+             xmlns:models="clr-namespace:FastTrak.Models"
              Title="RestaurantsPage">
     <VerticalStackLayout Padding="16" Spacing="12">
 
         <Label Text="Choose a restaurant"
-               FontSize="22"
+               FontSize="20"
                FontAttributes="Bold"
                TextColor="{StaticResource TextPrimaryColor}" />
 
-        <!-- Card-style list of restaurants -->
-        <CollectionView ItemsSource="{Binding Restaurants}"
-                SelectionMode="Single"
-                SelectedItem="{Binding SelectedRestaurant, Mode=TwoWay}"
-                SelectionChanged="CollectionView_SelectionChanged">
-
+        <!-- List of restaurants -->
+        <CollectionView x:Name="RestaurantsCollectionView"
+                        ItemsSource="{Binding Restaurants}"
+                        SelectionMode="Single"
+                        SelectionChanged="RestaurantsCollectionView_SelectionChanged">
             <CollectionView.ItemTemplate>
-                <DataTemplate>
-
+                <DataTemplate x:DataType="models:Restaurant">
+                    <!-- Restaurant card -->
                     <Frame Padding="16"
-                           Margin="0,6"
+                           Margin="0,8"
                            BackgroundColor="{StaticResource SurfaceColor}"
-                           CornerRadius="18"
+                           CornerRadius="12"
                            HasShadow="False">
-
                         <Label Text="{Binding Name}"
-                               FontSize="18"
+                               FontSize="16"
                                TextColor="{StaticResource TextPrimaryColor}" />
-
                     </Frame>
-
                 </DataTemplate>
             </CollectionView.ItemTemplate>
-
         </CollectionView>
 
-        <!-- Action button -->
-        <Button Text="View Menu"
-                FontSize="18"
-                Command="{Binding SelectRestaurantCommand}" />
-
     </VerticalStackLayout>
+
 
 </ContentPage>

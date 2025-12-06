@@ -25,12 +25,9 @@ namespace FastTrak.ViewModels
 
         public ObservableCollection<MenuItem> MenuItems { get; } = new();
 
-        [ObservableProperty]
-        private MenuItem? selectedMenuItem;
-
-        public MenuItemsViewModel(NutritionRepository repo)
+        public MenuItemsViewModel(NutritionRepository repository)
         {
-            _repository = repo;
+            _repository = repository;
         }
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -42,24 +39,22 @@ namespace FastTrak.ViewModels
         public async Task LoadAsync()
         {
             MenuItems.Clear();
-
             var items = await _repository.GetMenuItemsForRestaurantAsync(RestaurantId);
 
-            foreach (var item in items)
-                MenuItems.Add(item);
+            foreach (var m in items)
+                MenuItems.Add(m);
         }
 
         [RelayCommand]
-        private async Task SelectMenuItemAsync()
+        private async Task SelectMenuItemAsync(MenuItem item)
         {
-            if (SelectedMenuItem == null)
+            if (item == null)
                 return;
 
             var parameters = new Dictionary<string, object>
-            {
-                { "MenuItemId", SelectedMenuItem.Id },
-                { "RestaurantName", RestaurantName }
-            };
+        {
+            { "MenuItemId", item.Id }
+        };
 
             await Shell.Current.GoToAsync(nameof(CustomizationPage), parameters);
         }

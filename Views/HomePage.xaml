@@ -12,7 +12,7 @@
             <Label Text="FastTrak"
                    FontSize="36"
                    FontAttributes="Bold"
-                   TextColor="{StaticResource PrimaryColor}" />
+                   TextColor="{StaticResource Primary}" />
 
             <Label Text="Track fast-food nutrition in seconds."
                    FontSize="15"

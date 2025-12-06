@@ -26,6 +26,7 @@ namespace FastTrak
             builder.Services.AddTransient<HomeViewModel>();
             builder.Services.AddTransient<RestaurantsViewModel>();
             builder.Services.AddTransient<MenuItemsViewModel>();
+            builder.Services.AddTransient<CustomizationViewModel>();
 
             // Pages
             builder.Services.AddTransient<HomePage>();

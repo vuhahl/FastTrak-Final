@@ -19,40 +19,30 @@ namespace FastTrak.ViewModels
 
         public ObservableCollection<Restaurant> Restaurants { get; } = new();
 
-        [ObservableProperty]
-        private Restaurant? selectedRestaurant;
-
-        public RestaurantsViewModel(NutritionRepository repo)
+        public RestaurantsViewModel(NutritionRepository repository)
         {
-            _repository = repo;
+            _repository = repository;
         }
 
         public async Task LoadAsync()
         {
             Restaurants.Clear();
             var items = await _repository.GetRestaurantsAsync();
-
-            foreach (var restaurant in items)
-                Restaurants.Add(restaurant);
+            foreach (var r in items)
+                Restaurants.Add(r);
         }
 
         [RelayCommand]
-        private async Task SelectRestaurantAsync()
+        private async Task SelectRestaurantAsync(Restaurant restaurant)
         {
-            if (SelectedRestaurant == null)
-            {
-                await Shell.Current.DisplayAlert(
-                    "No restaurant selected",
-                    "Please tap a restaurant first.",
-                    "OK");
+            if (restaurant == null)
                 return;
-            }
 
             var parameters = new Dictionary<string, object>
-            {
-                { "RestaurantId", SelectedRestaurant.Id },
-                { "RestaurantName", SelectedRestaurant.Name }
-            };
+        {
+            { "RestaurantId", restaurant.Id },
+            { "RestaurantName", restaurant.Name }
+        };
 
             await Shell.Current.GoToAsync(nameof(MenuItemsPage), parameters);
         }
