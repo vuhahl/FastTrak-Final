@@ -28,6 +28,8 @@ namespace FastTrak
             builder.Services.AddTransient<RestaurantsViewModel>();
             builder.Services.AddTransient<MenuItemsViewModel>();
             builder.Services.AddTransient<CustomizationViewModel>();
+            builder.Services.AddTransient<CalculatorViewModel>();
+            builder.Services.AddTransient<FatSecretSearchViewModel>();
 
             // Pages
             builder.Services.AddTransient<HomePage>();
@@ -36,8 +38,8 @@ namespace FastTrak
             builder.Services.AddTransient<CustomizationPage>();
 
             builder.Services.AddSingleton<FatSecretService>();
-            builder.Services.AddTransient<FatSecretSearchViewModel>();
             builder.Services.AddTransient<FatSecretSearchPage>();
+            builder.Services.AddTransient<CalculatorPage>();
 
 
             return builder.Build();

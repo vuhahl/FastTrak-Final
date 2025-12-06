@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:FastTrak.ViewModels"
+             x:Class="FastTrak.Views.CalculatorPage"
+             Title="CalculatorPage">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="20">
+
+            <!-- Totals Card -->
+            <Frame BackgroundColor="{StaticResource SurfaceColor}"
+                   Padding="20"
+                   CornerRadius="16"
+                   HasShadow="False">
+
+                <VerticalStackLayout Spacing="10">
+
+                    <Label Text="Today's Totals"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimaryColor}" />
+
+                    <Grid ColumnDefinitions="*, Auto" RowDefinitions="Auto, Auto, Auto, Auto, Auto">
+
+                        <Label Text="Calories:" Grid.Row="0" />
+                        <Label Text="{Binding TotalCalories}" Grid.Row="0" Grid.Column="1" />
+
+                        <Label Text="Protein (g):" Grid.Row="1" />
+                        <Label Text="{Binding TotalProtein}" Grid.Row="1" Grid.Column="1" />
+
+                        <Label Text="Carbs (g):" Grid.Row="2" />
+                        <Label Text="{Binding TotalCarbs}" Grid.Row="2" Grid.Column="1" />
+
+                        <Label Text="Fat (g):" Grid.Row="3" />
+                        <Label Text="{Binding TotalFat}" Grid.Row="3" Grid.Column="1" />
+
+                        <Label Text="Sodium (mg):" Grid.Row="4" />
+                        <Label Text="{Binding TotalSodium}" Grid.Row="4" Grid.Column="1" />
+
+                    </Grid>
+
+                </VerticalStackLayout>
+
+            </Frame>
+
+            <!-- Logged Items List -->
+            <CollectionView ItemsSource="{Binding TodayItems}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Padding="16"
+                               Margin="0,8"
+                               CornerRadius="12"
+                               BackgroundColor="{StaticResource SurfaceColor}">
+
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="{Binding DisplayName}"
+                                       FontSize="16"
+                                       FontAttributes="Bold" />
+
+                                <Label Text="{Binding CaloriesOverride, StringFormat='Calories: {0}'}"
+                                       TextColor="{StaticResource TextSecondaryColor}" />
+
+                                <Label Text="{Binding Quantity, StringFormat='Qty: {0}'}"
+                                       TextColor="{StaticResource TextSecondaryColor}" />
+                            </VerticalStackLayout>
+
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button Text="Clear Today's Log"
+                    BackgroundColor="{StaticResource PrimaryColor}"
+                    TextColor="White"
+                    Command="{Binding ClearAllCommand}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

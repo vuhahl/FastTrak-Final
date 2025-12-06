@@ -172,16 +172,13 @@ namespace FastTrak.Data
 
 
 
-        public async Task ClearTodayAsync()
+        public Task<int> ClearLoggedItemsForTodayAsync()
         {
             var today = DateTime.Today;
 
-            var items = await _db.Table<LoggedItem>()
-                                 .Where(x => x.LoggedAt >= today)
-                                 .ToListAsync();
-
-            foreach (var item in items)
-                await _db.DeleteAsync(item);
+            return _db.Table<LoggedItem>()
+                      .Where(x => x.LoggedAt >= today)
+                      .DeleteAsync();
         }
     }
 }

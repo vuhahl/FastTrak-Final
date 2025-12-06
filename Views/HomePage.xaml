@@ -45,14 +45,14 @@
                 Padding="14"
                 Command="{Binding GoToRestaurantsCommand}" />
 
-        <!-- Nutritionix Search -->
+        <!-- Fat Service Search -->
         <Button Grid.Row="3"
-                Text="Search with Nutritionix"
+                Text="Search with FatService"
                 BackgroundColor="{StaticResource InfoColor}"
                 TextColor="White"
                 FontSize="18"
                 Padding="14"
-                Command="{Binding GoToNutritionixSearchCommand}" />
+                Command="{Binding GoToFatSecretSearchCommand}" />
 
     </Grid>
 
