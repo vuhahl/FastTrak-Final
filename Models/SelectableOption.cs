@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,8 +7,11 @@ using System.Threading.Tasks;
 
 namespace FastTrak.Models
 {
-    public class SelectableOption
+    public partial class SelectableOption : ObservableObject
     {
+        [ObservableProperty]
+        private bool isSelected;
+
         public int Id { get; set; }
         public string Name { get; set; }
         public string Category { get; set; }
@@ -18,10 +22,9 @@ namespace FastTrak.Models
         public decimal Fat { get; set; }
         public int Sodium { get; set; }
 
-        public bool IsSelected { get; set; }
-
         public string NutritionSummary =>
             $"{Calories} cal | {Protein}g P | {Carbs}g C | {Fat}g F | {Sodium}mg Na";
+
 
         public SelectableOption(CustomOption opt)
         {

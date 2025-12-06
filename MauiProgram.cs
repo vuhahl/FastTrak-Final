@@ -1,4 +1,5 @@
 ﻿using FastTrak.Data;
+using FastTrak.Services;
 using FastTrak.ViewModels;
 using FastTrak.Views;
 using Microsoft.Extensions.Logging;
@@ -33,7 +34,11 @@ namespace FastTrak
             builder.Services.AddTransient<RestaurantsPage>();
             builder.Services.AddTransient<MenuItemsPage>();
             builder.Services.AddTransient<CustomizationPage>();
-            builder.Services.AddTransient<NutritionixSearchPage>();
+
+            builder.Services.AddSingleton<FatSecretService>();
+            builder.Services.AddTransient<FatSecretSearchViewModel>();
+            builder.Services.AddTransient<FatSecretSearchPage>();
+
 
             return builder.Build();
         }

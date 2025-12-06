@@ -64,13 +64,35 @@ namespace FastTrak.ViewModels
             // Load allowed options
             var options = await _repo.GetCustomOptionsForMenuItemAsync(MenuItemId);
 
+            // Group and attach live-update listeners
             var grouped = options
                 .GroupBy(o => o.Category)
-                .Select(g => new OptionGroup
+                .Select(g =>
                 {
-                    Category = g.Key,
-                    Options = new ObservableCollection<SelectableOption>(
-                        g.Select(o => new SelectableOption(o)))
+                    var optionList = new ObservableCollection<SelectableOption>();
+
+                    foreach (var optModel in g)
+                    {
+                        var opt = new SelectableOption(optModel);
+
+                        //Attach listener for checkbox changes
+                        opt.PropertyChanged += (s, e) =>
+                        {
+                            if (e.PropertyName == nameof(SelectableOption.IsSelected))
+                            {
+                                // Notify UI that TotalNutritionText must refresh
+                                OnPropertyChanged(nameof(TotalNutritionText));
+                            }
+                        };
+
+                        optionList.Add(opt);
+                    }
+
+                    return new OptionGroup
+                    {
+                        Category = g.Key,
+                        Options = optionList
+                    };
                 });
 
             OptionGroups.Clear();
@@ -79,13 +101,20 @@ namespace FastTrak.ViewModels
         }
 
         [RelayCommand]
-        private void IncreaseQuantity() => Quantity++;
+        private void IncreaseQuantity()
+        {
+            Quantity++;
+            OnPropertyChanged(nameof(TotalNutritionText));
+        }
 
         [RelayCommand]
         private void DecreaseQuantity()
         {
             if (Quantity > 1)
+            {
                 Quantity--;
+                OnPropertyChanged(nameof(TotalNutritionText));
+            }
         }
 
         [RelayCommand]
@@ -110,5 +139,36 @@ namespace FastTrak.ViewModels
             await Shell.Current.DisplayAlert("Success", "Item added to your log.", "OK");
             await Shell.Current.GoToAsync("..");
         }
+
+        //properties for live calculation
+        public int TotalCalories =>
+    (BaseCalories + OptionGroups.SelectMany(g => g.Options)
+                                .Where(o => o.IsSelected)
+                                .Sum(o => o.Calories)) * Quantity;
+
+        public double TotalProtein =>
+            (double)((BaseProtein + OptionGroups.SelectMany(g => g.Options)
+                                       .Where(o => o.IsSelected)
+                                       .Sum(o => o.Protein)) * Quantity);
+
+        public double TotalCarbs =>
+            (double)((BaseCarbs + OptionGroups.SelectMany(g => g.Options)
+                                     .Where(o => o.IsSelected)
+                                     .Sum(o => o.Carbs)) * Quantity);
+
+        public double TotalFat =>
+            (double)((BaseFat + OptionGroups.SelectMany(g => g.Options)
+                                   .Where(o => o.IsSelected)
+                                   .Sum(o => o.Fat)) * Quantity);
+
+        public int TotalSodium =>
+            (BaseSodium + OptionGroups.SelectMany(g => g.Options)
+                                      .Where(o => o.IsSelected)
+                                      .Sum(o => o.Sodium)) * Quantity;
+
+        public string TotalNutritionText =>
+            $"{TotalCalories} cal | {TotalProtein}g P | {TotalCarbs}g C | {TotalFat}g F | {TotalSodium}mg Na";
+
+
     }
 }

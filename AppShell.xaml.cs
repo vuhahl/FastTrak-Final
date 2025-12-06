@@ -10,7 +10,7 @@ namespace FastTrak
             // Register navigation routes for non-tab pages
             Routing.RegisterRoute(nameof(MenuItemsPage), typeof(MenuItemsPage));
             Routing.RegisterRoute(nameof(CustomizationPage), typeof(CustomizationPage));
-            Routing.RegisterRoute(nameof(NutritionixSearchPage), typeof(NutritionixSearchPage));
+            Routing.RegisterRoute(nameof(FatSecretSearchPage), typeof(FatSecretSearchPage));
         }
     }
 }

@@ -1,46 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FastTrak.Data;
 using FastTrak.Views;
+using FastTrak.Models;
+using FastTrak.Services;
+using System.Collections.ObjectModel;
 
-namespace FastTrak.ViewModels
+/// <summary>
+/// Loads today's log items + count and handles navigation from Home screen.
+/// </summary>
+public partial class HomeViewModel : ObservableObject
 {
+    private readonly NutritionRepository _repository;
+
     /// <summary>
-    /// Loads today's log count and handles navigation buttons.
+    /// Number of items logged today.
     /// </summary>
-    public partial class HomeViewModel : ObservableObject
+    [ObservableProperty]
+    private int todayItemCount;
+
+    /// <summary>
+    /// The actual logged items for today.
+    /// </summary>
+    public ObservableCollection<LoggedItem> TodayLoggedItems { get; } =
+        new ObservableCollection<LoggedItem>();
+
+    public HomeViewModel(NutritionRepository repo)
     {
-        private readonly NutritionRepository _repository;
+        _repository = repo;
+    }
 
-        [ObservableProperty]
-        private int todayItemCount;
+    /// <summary>
+    /// Reloads all log data every time the Home page appears.
+    /// </summary>
+    public async Task LoadAsync()
+    {
+        TodayLoggedItems.Clear();
 
-        public HomeViewModel(NutritionRepository repo)
-        {
-            _repository = repo;
-        }
+        var items = await _repository.GetLoggedItemsForTodayAsync();
 
-        public async Task LoadAsync()
-        {
-            TodayItemCount = await _repository.GetTodaySelectionCountAsync();
-        }
+        foreach (var item in items)
+            TodayLoggedItems.Add(item);
 
-        [RelayCommand]
-        private Task GoToRestaurantsAsync()
-        {
-            return Shell.Current.GoToAsync("//RestaurantsPage");
-        }
+        todayItemCount = TodayLoggedItems.Count;
+    }
 
-        [RelayCommand]
-        private Task GoToNutritionixSearchAsync()
-        {
-            return Shell.Current.GoToAsync(nameof(NutritionixSearchPage));
-        }
+    /// <summary>
+    /// Navigates to Restaurants list.
+    /// </summary>
+    [RelayCommand]
+    private Task GoToRestaurantsAsync()
+    {
+        return Shell.Current.GoToAsync("//RestaurantsPage");
+    }
+
+    /// </summary>
+    [RelayCommand]
+    private Task GoToFatSecretSearchAsync()
+    {
+        return Shell.Current.GoToAsync(nameof(FatSecretSearchPage));
     }
 }
-

@@ -107,6 +107,23 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
+            <!-- LIVE TOTAL NUTRITION -->
+            <Frame BackgroundColor="{StaticResource SurfaceColor}"
+       CornerRadius="14"
+       Padding="16">
+
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Total Nutrition"
+               FontSize="20"
+               FontAttributes="Bold" />
+
+                    <Label Text="{Binding TotalNutritionText}"
+               FontSize="14"
+               TextColor="{StaticResource TextSecondaryColor}" />
+                </VerticalStackLayout>
+
+            </Frame>
+
             <!-- Add Button -->
             <Button Text="Add to Log"
                     FontSize="20"
