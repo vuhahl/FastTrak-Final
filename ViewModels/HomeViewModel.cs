@@ -41,8 +41,7 @@ public partial class HomeViewModel : ObservableObject
 
         foreach (var item in items)
             TodayLoggedItems.Add(item);
-
-        todayItemCount = TodayLoggedItems.Count;
+        TodayItemCount = TodayLoggedItems.Count;
     }
 
     /// <summary>

@@ -8,4 +8,9 @@ public partial class HomePage : ContentPage
 		InitializeComponent();
         BindingContext = vm;
     }
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await ((HomeViewModel)BindingContext).LoadAsync();
+    }
 }
