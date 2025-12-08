@@ -2,16 +2,13 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="FastTrak.Views.HomePage"
-             x:Name="HomePageRoot"
              Title="HomePage">
 
     <ScrollView>
-        <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto"
-              Padding="24"
-              RowSpacing="20">
+        <VerticalStackLayout Padding="24" Spacing="20">
 
             <!-- App Title -->
-            <VerticalStackLayout Grid.Row="0" Spacing="10">
+            <VerticalStackLayout Spacing="4">
                 <Label Text="FastTrak"
                        FontSize="36"
                        FontAttributes="Bold"
@@ -20,41 +17,35 @@
                 <Label Text="Track fast-food nutrition in seconds."
                        FontSize="15"
                        TextColor="{StaticResource TextSecondaryColor}" />
+            </VerticalStackLayout>
 
-                <!-- BROWSE RESTAURANTS -->
-                <Button Grid.Row="1"
-        Text="Browse Restaurants"
-        BackgroundColor="{StaticResource SecondaryColor}"
-        TextColor="White"
-        FontSize="18"
-        Padding="12"
-        CornerRadius="14"
-        Command="{Binding GoToRestaurantsCommand}" />
-
-                <!-- SEARCH WITH FATSECRET -->
-                <Button Grid.Row="2"
-        Text="Search with FatService"
-        BackgroundColor="{StaticResource InfoColor}"
-        TextColor="White"
-        FontSize="18"
-        Padding="14"
-        CornerRadius="14"
-        Command="{Binding GoToFatSecretSearchCommand}" />
-
-
-                <Button Grid.Row="3"
-                    Text="Open Calculator"
-                    BackgroundColor="{StaticResource AccentColor}"
+            <!-- Navigation Buttons -->
+            <Button Text="Browse Restaurants"
+                    BackgroundColor="{StaticResource SecondaryColor}"
                     TextColor="White"
                     FontSize="18"
                     Padding="14"
                     CornerRadius="14"
-                    Command="{Binding GoToCalculatorCommand}" />    
-            </VerticalStackLayout>
+                    Command="{Binding GoToRestaurantsCommand}" />
 
-            <!-- TODAY'S LOG SUMMARY CARD -->
-            <Frame Grid.Row="3"
-                   BackgroundColor="{StaticResource SurfaceColor}"
+            <Button Text="Search with FatService"
+                    BackgroundColor="{StaticResource InfoColor}"
+                    TextColor="White"
+                    FontSize="18"
+                    Padding="14"
+                    CornerRadius="14"
+                    Command="{Binding GoToFatSecretSearchCommand}" />
+
+            <Button Text="Open Calculator"
+                    BackgroundColor="{StaticResource PrimaryColor}"
+                    TextColor="White"
+                    FontSize="18"
+                    Padding="14"
+                    CornerRadius="14"
+                    Command="{Binding GoToCalculatorCommand}" />
+
+            <!-- Today's Log Summary -->
+            <Frame BackgroundColor="{StaticResource SurfaceColor}"
                    CornerRadius="20"
                    Padding="20"
                    HasShadow="False">
@@ -65,9 +56,8 @@
                            FontAttributes="Bold"
                            TextColor="{StaticResource TextPrimaryColor}" />
 
-                    <!-- Totals row -->
                     <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="12">
-                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                        <VerticalStackLayout Spacing="2">
                             <Label Text="{Binding TotalCalories}"
                                    FontSize="22"
                                    FontAttributes="Bold"
@@ -108,149 +98,13 @@
                         </VerticalStackLayout>
                     </Grid>
 
-                    <!-- Item count -->
                     <Label Text="{Binding TodayItemCount, StringFormat='{0} items logged'}"
                            FontSize="13"
                            TextColor="{StaticResource TextSecondaryColor}" />
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- MY TRAY ITEMS HEADER -->
-            <Label Grid.Row="2"
-                   Text="My Tray Items"
-                   FontSize="18"
-                   FontAttributes="Bold"
-                   TextColor="{StaticResource TextPrimaryColor}" />
-
-            <!-- TRAY ITEMS LIST -->
-            <CollectionView Grid.Row="4"
-                            ItemsSource="{Binding TodayLoggedItems}">
-                <CollectionView.EmptyView>
-                    <Frame Padding="16"
-                           CornerRadius="16"
-                           BackgroundColor="{StaticResource SurfaceColor}">
-                        <Label Text="No items in your tray yet. Add items from Restaurants or FatSecret."
-                               TextColor="{StaticResource TextSecondaryColor}" />
-                    </Frame>
-                </CollectionView.EmptyView>
-
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Frame Margin="0,6"
-                               Padding="14"
-                               CornerRadius="16"
-                               BackgroundColor="{StaticResource SurfaceColor}"
-                               HasShadow="False">
-
-                            <VerticalStackLayout Spacing="8">
-
-                                <!-- Name + remove button -->
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <Label Text="{Binding DisplayName}"
-                                           FontSize="16"
-                                           FontAttributes="Bold"
-                                           TextColor="{StaticResource TextPrimaryColor}" />
-
-                                    <Button Grid.Column="1"
-                                            Text="Remove"
-                                            FontSize="12"
-                                            Padding="4"
-                                            BackgroundColor="Transparent"
-                                            TextColor="DimGray"
-                                            Command="{Binding BindingContext.DeleteLoggedItemCommand, Source={x:Reference HomePageRoot}}"
-                                            CommandParameter="{Binding .}" />                           
-                                </Grid>
-
-                                <!-- Quantity controls -->
-                                <Grid ColumnDefinitions="Auto,Auto"
-                                      ColumnSpacing="12">
-                                    <Label Text="Quantity:"
-                                           TextColor="{StaticResource TextSecondaryColor}" />
-
-                                    <HorizontalStackLayout Grid.Column="1" Spacing="6">
-                                        <Button Text="-"
-                                                Padding="6,0"
-                                                WidthRequest="32"
-                                                HeightRequest="20"
-                                                BackgroundColor="{StaticResource PrimaryColor}"
-                                                TextColor="White"
-                                                CornerRadius="16"
-                                                Command="{Binding BindingContext.DecreaseItemQuantityCommand, Source={x:Reference HomePageRoot}}"
-                                                CommandParameter="{Binding .}" />
-
-                                        <Label Text="{Binding Quantity}"
-                                               VerticalOptions="Center"
-                                               TextColor="{StaticResource TextPrimaryColor}" />
-
-                                        <Button Text="+"
-                                                Padding="6,0"
-                                                WidthRequest="32"
-                                                HeightRequest="20"
-                                                BackgroundColor="{StaticResource PrimaryColor}"
-                                                TextColor="White"
-                                                CornerRadius="16"
-                                                Command="{Binding BindingContext.IncreaseItemQuantityCommand, Source={x:Reference HomePageRoot}}"
-                                                CommandParameter="{Binding .}" />
-                                    </HorizontalStackLayout>
-                                </Grid>
-
-                                <!-- Per-unit macros row -->
-                                <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10" Margin="0,4,0,0">
-                                    <VerticalStackLayout Spacing="2">
-                                        <Label Text="{Binding CaloriesOverride}"
-                                               FontAttributes="Bold"
-                                               TextColor="{StaticResource TextPrimaryColor}" />
-                                        <Label Text="Cal"
-                                               FontSize="12"
-                                               TextColor="{StaticResource TextSecondaryColor}" />
-                                    </VerticalStackLayout>
-
-                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                        <Label Text="{Binding ProteinOverride}"
-                                               FontAttributes="Bold"
-                                               TextColor="{StaticResource TextPrimaryColor}" />
-                                        <Label Text="Pro"
-                                               FontSize="12"
-                                               TextColor="{StaticResource TextSecondaryColor}" />
-                                    </VerticalStackLayout>
-
-                                    <VerticalStackLayout Grid.Column="2" Spacing="2">
-                                        <Label Text="{Binding CarbsOverride}"
-                                               FontAttributes="Bold"
-                                               TextColor="{StaticResource TextPrimaryColor}" />
-                                        <Label Text="Carb"
-                                               FontSize="12"
-                                               TextColor="{StaticResource TextSecondaryColor}" />
-                                    </VerticalStackLayout>
-
-                                    <VerticalStackLayout Grid.Column="3" Spacing="2">
-                                        <Label Text="{Binding FatOverride}"
-                                               FontAttributes="Bold"
-                                               TextColor="{StaticResource TextPrimaryColor}" />
-                                        <Label Text="Fat"
-                                               FontSize="12"
-                                               TextColor="{StaticResource TextSecondaryColor}" />
-                                    </VerticalStackLayout>
-                                </Grid>
-
-                            </VerticalStackLayout>
-                        </Frame>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-
-            <!-- CLEAR ALL -->
-            <Button Grid.Row="5"
-                    Text="Clear All Items"
-                    BackgroundColor="#FFE5E5"
-                    TextColor="#CC0000"
-                    FontSize="16"
-                    Padding="12"
-                    CornerRadius="14"
-                    Command="{Binding ClearAllItemsCommand}" />
-
-            
-        </Grid>
+        </VerticalStackLayout>
     </ScrollView>
 
 </ContentPage>

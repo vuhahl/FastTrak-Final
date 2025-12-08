@@ -16,28 +16,32 @@ namespace FastTrak.ViewModels
     {
         private readonly NutritionRepository _repo;
 
-        // Passed-in parameters
+        // store the MenuItem ID passed from the MenuItemsPage
         [ObservableProperty]
         private int menuItemId;
 
+        // This holds the visible name of the item (e.g., “Classic Chicken Sandwich”)
         [ObservableProperty]
         private string itemName = string.Empty;
 
-        // Base nutrition
+        // Base menu item nutrition (the values before customizations)
         public int BaseCalories { get; set; }
         public decimal BaseProtein { get; set; }
         public decimal BaseCarbs { get; set; }
         public decimal BaseFat { get; set; }
         public int BaseSodium { get; set; }
 
+        // Shown under “Nutrition (Base)” on the UI
         public string BaseNutritionText =>
             $"{BaseCalories} cal | {BaseProtein}g protein | " +
             $"{BaseCarbs}g carbs | {BaseFat}g fat | {BaseSodium}mg sodium";
 
+        // I track quantity → affects final macros
         [ObservableProperty]
         private int quantity = 1;
 
-        // All selectable options grouped by category (e.g. MilkType, Sauces)
+        // All groups of options that apply to this item
+        // (e.g., Milk Types, Toppings, Sauces, BurgerToppings, etc.)
         public ObservableCollection<OptionGroup> OptionGroups { get; set; } = new();
 
         public CustomizationViewModel(NutritionRepository repo)
@@ -45,15 +49,16 @@ namespace FastTrak.ViewModels
             _repo = repo;
         }
 
-        // Receives query parameters from Shell navigation
+        // I extract navigation parameters (MenuItemId)
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             MenuItemId = (int)query["MenuItemId"];
         }
 
-        // Load base menu item + custom options
+        // MAIN LOAD METHOD — loads base item and attaches appropriate options
         public async Task LoadAsync()
         {
+            // Load base menu item
             var item = await _repo.GetMenuItemAsync(MenuItemId);
 
             ItemName = item.Name;
@@ -64,11 +69,30 @@ namespace FastTrak.ViewModels
             BaseFat = (decimal)item.Fat;
             BaseSodium = item.Sodium;
 
-            // Load allowed options
-            var options = await _repo.GetCustomOptionsForMenuItemAsync(MenuItemId);
+           
+            var allOptions = await _repo.GetCustomOptionsForMenuItemAsync(MenuItemId);
 
-            // Group and attach live-update listeners
-            var grouped = options
+            IEnumerable<MenuItemOption> filteredOptions = (IEnumerable<MenuItemOption>)allOptions;
+
+            // Normalize category text so spelling variants don't break logic
+            string category = item.Category?.Trim().ToLower() ?? "";
+
+            if (category == "sandwich")
+            {
+                //  ONLY include "Topping" for sandwiches
+                filteredOptions = (IEnumerable<MenuItemOption>)allOptions.Where(o => o.Category == "Topping");
+            }
+            else if (category == "burger")
+            {
+                // ONLY include "BurgerTopping" for burgers
+                filteredOptions = (IEnumerable<MenuItemOption>)allOptions.Where(o => o.Category == "BurgerTopping");
+            }
+            // Wings, Donuts, Beverages, etc. → no filtering required
+
+            // -----------------------------
+            // GROUP OPTIONS FOR UI
+            // -----------------------------
+            var grouped = filteredOptions
                 .GroupBy(o => o.Category)
                 .Select(g =>
                 {
@@ -76,9 +100,10 @@ namespace FastTrak.ViewModels
 
                     foreach (var optModel in g)
                     {
+                        // I create a selectable wrapper (holds IsSelected & Model)
                         var opt = new SelectableOption(optModel);
 
-                        //Attach listener for checkbox changes
+                        // I wire up live macro recalculation when a checkbox toggles
                         opt.PropertyChanged += (s, e) =>
                         {
                             if (e.PropertyName == nameof(SelectableOption.IsSelected))
@@ -102,16 +127,18 @@ namespace FastTrak.ViewModels
                     };
                 });
 
+            // Clear and repopulate groups
             OptionGroups.Clear();
             foreach (var group in grouped)
                 OptionGroups.Add(group);
 
-            // Notify UI that base + totals are now available
+            // Notify UI that base nutrition + totals are available
             OnPropertyChanged(nameof(BaseNutritionText));
             OnPropertyChanged(nameof(TotalNutritionText));
         }
 
-        // Quantity buttons
+
+        // QUANTITY CONTROL BUTTONS
         [RelayCommand]
         private void IncreaseQuantity()
         {
@@ -139,17 +166,18 @@ namespace FastTrak.ViewModels
             }
         }
 
-        // ADD TO LOG: freeze the final macros into LoggedItem override fields
+
+        // ADD TO LOG — freezes final nutrition values for use on Home & Calculator pages
         [RelayCommand]
         private async Task AddToLog()
         {
+            //  freeze the *calculated final macros* into LoggedItem override fields
             var loggedItem = new LoggedItem
             {
                 MenuItemId = MenuItemId,
                 LoggedAt = DateTime.Now,
                 Quantity = Quantity,
 
-                // Important: set name + macros so Home/Calculator can display them
                 NameOverride = ItemName,
                 CaloriesOverride = TotalCalories,
                 ProteinOverride = (decimal)TotalProtein,
@@ -160,7 +188,7 @@ namespace FastTrak.ViewModels
 
             await _repo.InsertLoggedItemAsync(loggedItem);
 
-            // Insert selected options for this log entry
+            // Save selected customization options for historical accuracy
             foreach (var group in OptionGroups)
             {
                 foreach (var opt in group.Options.Where(o => o.IsSelected))
@@ -171,35 +199,38 @@ namespace FastTrak.ViewModels
             await Shell.Current.GoToAsync("..");
         }
 
-        //properties for live calculation
+
+        // -----------------------------
+        // LIVE CALCULATION PROPERTIES
+        // -----------------------------
+
         public int TotalCalories =>
-    (BaseCalories + OptionGroups.SelectMany(g => g.Options)
-                                .Where(o => o.IsSelected)
-                                .Sum(o => o.Calories)) * Quantity;
+            (BaseCalories +
+             OptionGroups.SelectMany(g => g.Options).Where(o => o.IsSelected).Sum(o => o.Calories))
+            * Quantity;
 
         public double TotalProtein =>
-            (double)((BaseProtein + OptionGroups.SelectMany(g => g.Options)
-                                       .Where(o => o.IsSelected)
-                                       .Sum(o => o.Protein)) * Quantity);
+            (double)((BaseProtein +
+                      OptionGroups.SelectMany(g => g.Options).Where(o => o.IsSelected).Sum(o => o.Protein))
+                      * Quantity);
 
         public double TotalCarbs =>
-            (double)((BaseCarbs + OptionGroups.SelectMany(g => g.Options)
-                                     .Where(o => o.IsSelected)
-                                     .Sum(o => o.Carbs)) * Quantity);
+            (double)((BaseCarbs +
+                      OptionGroups.SelectMany(g => g.Options).Where(o => o.IsSelected).Sum(o => o.Carbs))
+                      * Quantity);
 
         public double TotalFat =>
-            (double)((BaseFat + OptionGroups.SelectMany(g => g.Options)
-                                   .Where(o => o.IsSelected)
-                                   .Sum(o => o.Fat)) * Quantity);
+            (double)((BaseFat +
+                      OptionGroups.SelectMany(g => g.Options).Where(o => o.IsSelected).Sum(o => o.Fat))
+                      * Quantity);
 
         public int TotalSodium =>
-            (BaseSodium + OptionGroups.SelectMany(g => g.Options)
-                                      .Where(o => o.IsSelected)
-                                      .Sum(o => o.Sodium)) * Quantity;
+            (BaseSodium +
+             OptionGroups.SelectMany(g => g.Options).Where(o => o.IsSelected).Sum(o => o.Sodium))
+            * Quantity;
+
 
         public string TotalNutritionText =>
             $"{TotalCalories} cal | {TotalProtein}g P | {TotalCarbs}g C | {TotalFat}g F | {TotalSodium}mg Na";
-
-
     }
 }

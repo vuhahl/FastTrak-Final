@@ -75,6 +75,12 @@ public partial class HomeViewModel : ObservableObject
         return Shell.Current.GoToAsync(nameof(FatSecretSearchPage));
     }
 
+    [RelayCommand]
+    private async Task GoToCalculatorAsync()
+    {
+        await Shell.Current.GoToAsync(nameof(CalculatorPage));
+    }
+
     // ========== Tray Editing Commands ==========
 
     [RelayCommand]
