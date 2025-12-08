@@ -46,6 +46,13 @@
 
             <!-- Logged Items List -->
             <CollectionView ItemsSource="{Binding TodayItems}">
+                <CollectionView.EmptyView>
+                    <Label Text="No items logged yet."
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           TextColor="{StaticResource TextSecondaryColor}" />
+                </CollectionView.EmptyView>
+
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame Padding="16"
@@ -72,7 +79,7 @@
 
             <Button Text="Clear Today's Log"
                     BackgroundColor="{StaticResource PrimaryColor}"
-                    TextColor="White"
+                    TextColor="Black"
                     Command="{Binding ClearAllCommand}" />
 
         </VerticalStackLayout>
