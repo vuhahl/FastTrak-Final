@@ -13,10 +13,15 @@ public partial class HomeViewModel : ObservableObject
 {
     private readonly NutritionRepository _repository;
 
+    /// <summary>
+    /// Items logged for today.
+    /// </summary>
     public ObservableCollection<LoggedItem> TodayLoggedItems { get; } = new();
 
+    // "Today’s Log" count
     [ObservableProperty] private int todayItemCount;
 
+    // Totals shown in the summary card
     [ObservableProperty] private int totalCalories;
     [ObservableProperty] private decimal totalProtein;
     [ObservableProperty] private decimal totalCarbs;
@@ -27,12 +32,15 @@ public partial class HomeViewModel : ObservableObject
         _repository = repository;
     }
 
+    /// <summary>
+    /// Reloads today's log from the database.
+    /// Called from HomePage.OnAppearing().
+    /// </summary>
     public async Task LoadAsync()
     {
         TodayLoggedItems.Clear();
 
         var items = await _repository.GetLoggedItemsForTodayAsync();
-
         foreach (var item in items)
             TodayLoggedItems.Add(item);
 
@@ -40,51 +48,46 @@ public partial class HomeViewModel : ObservableObject
         RecalculateTotals();
     }
 
+    /// <summary>
+    /// Totals are computed as per-unit macros * quantity.
+    /// CaloriesOverride / ProteinOverride / etc are stored per 1 unit.
+    /// </summary>
     private void RecalculateTotals()
     {
-        totalCalories = TodayLoggedItems.Sum(i => i.CaloriesOverride);
-        totalProtein = TodayLoggedItems.Sum(i => i.ProteinOverride);
-        totalCarbs = TodayLoggedItems.Sum(i => i.CarbsOverride);
-        totalFat = TodayLoggedItems.Sum(i => i.FatOverride);
+        TotalCalories = TodayLoggedItems.Sum(i => i.CaloriesOverride * i.Quantity);
+        TotalProtein = TodayLoggedItems.Sum(i => i.ProteinOverride * i.Quantity);
+        TotalCarbs = TodayLoggedItems.Sum(i => i.CarbsOverride * i.Quantity);
+        TotalFat = TodayLoggedItems.Sum(i => i.FatOverride * i.Quantity);
     }
 
-    // ===== Navigation Commands =====
+    // ========== Navigation ==========
 
     [RelayCommand]
-    private async Task GoToRestaurantsAsync()
+    private Task GoToRestaurantsAsync()
     {
-        await Shell.Current.GoToAsync(nameof(RestaurantsPage));
+        // RestaurantsPage is a ShellContent item
+        return Shell.Current.GoToAsync("//RestaurantsPage");
     }
 
     [RelayCommand]
-    private async Task GoToFatSecretSearchAsync()
+    private Task GoToFatSecretSearchAsync()
     {
-        await Shell.Current.GoToAsync(nameof(FatSecretSearchPage));
+        return Shell.Current.GoToAsync(nameof(FatSecretSearchPage));
     }
 
-    // ===== Tray Item Commands =====
+    // ========== Tray Editing Commands ==========
 
-    // Editing: adjust quantity and recalc macros by treating stored macros as "total" for current quantity
     [RelayCommand]
     private async Task IncreaseItemQuantityAsync(LoggedItem item)
     {
         if (item == null) return;
 
-        if (item.Quantity <= 0) item.Quantity = 1;
-
-        var perCal = (decimal)item.CaloriesOverride / item.Quantity;
-        var perPro = item.ProteinOverride / item.Quantity;
-        var perCarb = item.CarbsOverride / item.Quantity;
-        var perFat = item.FatOverride / item.Quantity;
-
+        // simple +1, per-unit macros stay the same
         item.Quantity++;
-
-        item.CaloriesOverride = (int)(perCal * item.Quantity);
-        item.ProteinOverride = perPro * item.Quantity;
-        item.CarbsOverride = perCarb * item.Quantity;
-        item.FatOverride = perFat * item.Quantity;
-
         await _repository.UpdateLoggedItemAsync(item);
+
+        // count & totals
+        TodayItemCount = TodayLoggedItems.Count;
         RecalculateTotals();
     }
 
@@ -92,21 +95,12 @@ public partial class HomeViewModel : ObservableObject
     private async Task DecreaseItemQuantityAsync(LoggedItem item)
     {
         if (item == null) return;
-        if (item.Quantity <= 1) return; // don't go below 1
-
-        var perCal = (decimal)item.CaloriesOverride / item.Quantity;
-        var perPro = item.ProteinOverride / item.Quantity;
-        var perCarb = item.CarbsOverride / item.Quantity;
-        var perFat = item.FatOverride / item.Quantity;
+        if (item.Quantity <= 1) return; // do not go below 1
 
         item.Quantity--;
-
-        item.CaloriesOverride = (int)(perCal * item.Quantity);
-        item.ProteinOverride = perPro * item.Quantity;
-        item.CarbsOverride = perCarb * item.Quantity;
-        item.FatOverride = perFat * item.Quantity;
-
         await _repository.UpdateLoggedItemAsync(item);
+
+        TodayItemCount = TodayLoggedItems.Count;
         RecalculateTotals();
     }
 
@@ -136,7 +130,7 @@ public partial class HomeViewModel : ObservableObject
         if (!TodayLoggedItems.Any()) return;
 
         bool confirm = await Shell.Current.DisplayAlert(
-            "Clear All Items",
+            "Clear Today's Log",
             "This will remove all items in today's log.",
             "Clear",
             "Cancel");
@@ -150,3 +144,5 @@ public partial class HomeViewModel : ObservableObject
         RecalculateTotals();
     }
 }
+    
+

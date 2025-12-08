@@ -20,22 +20,12 @@
             ContentTemplate="{DataTemplate views:RestaurantsPage}"
             Route="RestaurantsPage" />
 
-        <!-- MENU ITEMS PAGE (not a tab, but must be registered) -->
-        <!-- We DO NOT place this in TabBar because it's a detail page -->
-
-        <!-- CALCULATOR PAGE 
+       
+        <!-- CALCULATOR PAGE -->
         <ShellContent
             Title="Calculator"
             ContentTemplate="{DataTemplate views:CalculatorPage}"
             Route="CalculatorPage" />
-
-         ABOUT PAGE 
-        <ShellContent
-            Title="About"
-            ContentTemplate="{DataTemplate views:AboutPage}"
-            Route="AboutPage" />
-        
-        -->
 
     </TabBar>
 
