@@ -3,52 +3,112 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="FastTrak.Views.MenuItemsPage"
              xmlns:models="clr-namespace:FastTrak.Models"
-             Title="MenuItemsPage">
-    <Grid RowDefinitions="Auto, *" Padding="16">
+             x:Name="MenuItemsPageRoot"
+             Title="{Binding RestaurantName}">
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
 
-        <!-- Header -->
-        <Label Text="{Binding RestaurantName}"
-               FontSize="20"
-               FontAttributes="Bold"
-               Grid.Row="0"
-               TextColor="{StaticResource TextPrimaryColor}" />
+            <Label Text="{Binding RestaurantName}"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   TextColor="{StaticResource TextPrimaryColor}" />
 
-        <!-- Scrollable Menu Items -->
-        <CollectionView Grid.Row="1"
-                        ItemsSource="{Binding MenuItems}"
-                        SelectionMode="Single"
-                        SelectionChanged="MenuItemsCollectionView_SelectionChanged">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame Padding="16"
-                           Margin="0,8"
-                           BackgroundColor="{StaticResource SurfaceColor}"
-                           CornerRadius="12"
-                           HasShadow="False">
+            <CollectionView ItemsSource="{Binding MenuItems}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame Margin="0,8"
+                               Padding="16"
+                               CornerRadius="16"
+                               BackgroundColor="{StaticResource SurfaceColor}"
+                               HasShadow="False">
 
-                        <VerticalStackLayout Spacing="6">
+                            <VerticalStackLayout Spacing="10">
 
-                            <Label Text="{Binding Name}"
-                                   FontSize="16"
-                                   FontAttributes="Bold" />
+                                <!-- Name + category -->
+                                <StackLayout>
+                                    <Label Text="{Binding Name}"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimaryColor}" />
+                                    <Label Text="{Binding Category}"
+                                           FontSize="12"
+                                           TextColor="{StaticResource TextSecondaryColor}" />
+                                </StackLayout>
 
-                            <Label Text="{Binding Calories, StringFormat='Calories: {0}'}"
-                                   FontSize="14"
-                                   TextColor="{StaticResource TextSecondaryColor}" />
+                                <!-- Macros -->
+                                <Grid ColumnDefinitions="*,*,*,*" Margin="0,4,0,0">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                        <Label Text="{Binding Calories}"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimaryColor}" />
+                                        <Label Text="Calories"
+                                               FontSize="12"
+                                               TextColor="{StaticResource TextSecondaryColor}" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                        <Label Text="{Binding Protein}"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimaryColor}" />
+                                        <Label Text="Protein"
+                                               FontSize="12"
+                                               TextColor="{StaticResource TextSecondaryColor}" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="2" Spacing="2">
+                                        <Label Text="{Binding Carbs}"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimaryColor}" />
+                                        <Label Text="Carbs"
+                                               FontSize="12"
+                                               TextColor="{StaticResource TextSecondaryColor}" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="3" Spacing="2">
+                                        <Label Text="{Binding Fat}"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimaryColor}" />
+                                        <Label Text="Fat"
+                                               FontSize="12"
+                                               TextColor="{StaticResource TextSecondaryColor}" />
+                                    </VerticalStackLayout>
+                                </Grid>
 
-                            
-                            <Button Text="Customize"
-                            BackgroundColor="{StaticResource PrimaryColor}"
-                            TextColor="White"
-                            CommandParameter="{Binding .}"
-                             Clicked="Customize_Clicked" />
+                                <!-- Action buttons -->
+                                <!-- Customize & Add: default visible, hidden when IsDirectAdd == true -->
+                                <Button Text="Customize and Add"
+                                        BackgroundColor="{StaticResource PrimaryColor}"
+                                        TextColor="White"
+                                        Command="{Binding BindingContext.SelectMenuItemCommand, Source={x:Reference MenuItemsPageRoot}}"
+                                        CommandParameter="{Binding .}">
+                                    <Button.Triggers>
+                                        <DataTrigger TargetType="Button"
+                                                     Binding="{Binding IsDirectAdd}"
+                                                     Value="True">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
+                                    </Button.Triggers>
+                                </Button>
 
-                        </VerticalStackLayout>
+                                <!-- Add to Calculator: visible when IsDirectAdd == true -->
+                                <Button Text="Add to Calculator"
+                                        BackgroundColor="{StaticResource InfoColor}"
+                                        TextColor="White"
+                                        IsVisible="False"
+                                        Command="{Binding BindingContext.AddToLogDirectCommand, Source={x:Reference MenuItemsPageRoot}}"
+                                        CommandParameter="{Binding .}">
+                                    <Button.Triggers>
+                                        <DataTrigger TargetType="Button"
+                                                     Binding="{Binding IsDirectAdd}"
+                                                     Value="True">
+                                            <Setter Property="IsVisible" Value="True" />
+                                        </DataTrigger>
+                                    </Button.Triggers>
+                                </Button>
 
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                            </VerticalStackLayout>
 
-    </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

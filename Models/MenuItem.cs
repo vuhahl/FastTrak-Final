@@ -25,5 +25,13 @@ namespace FastTrak.Models
 
         // Category (optional)
         public string Category { get; set; } = string.Empty;
-    }
+    
+
+    // Decide whether this item should bypass customization and be added directly
+    public bool IsDirectAdd =>
+    string.Equals(Category, "Sauces", StringComparison.OrdinalIgnoreCase) ||
+    string.Equals(Category, "Sides", StringComparison.OrdinalIgnoreCase) ||
+    string.Equals(Category, "Donuts", StringComparison.OrdinalIgnoreCase);
+    
+    } 
 }

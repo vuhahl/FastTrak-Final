@@ -138,6 +138,18 @@ namespace FastTrak.Data
             return _db.InsertAsync(item);
         }
 
+        // Update an existing logged item (e.g., after quantity change)
+        public Task<int> UpdateLoggedItemAsync(LoggedItem item)
+        {
+            return _db.UpdateAsync(item);
+        }
+
+        // Delete a single logged item
+        public Task<int> DeleteLoggedItemAsync(int id)
+        {
+            return _db.DeleteAsync<LoggedItem>(id);
+        }
+
         public Task<List<LoggedItem>> GetLoggedItemsForTodayAsync()
         {
             var today = DateTime.Today;

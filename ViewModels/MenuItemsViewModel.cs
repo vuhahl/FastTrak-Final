@@ -45,6 +45,7 @@ namespace FastTrak.ViewModels
                 MenuItems.Add(m);
         }
 
+        // Used for categories that REQUIRE customization (Burgers, Sandwiches, Beverages, Salads, Wings, etc.)
         [RelayCommand]
         private async Task SelectMenuItemAsync(MenuItem item)
         {
@@ -52,11 +53,40 @@ namespace FastTrak.ViewModels
                 return;
 
             var parameters = new Dictionary<string, object>
-        {
-            { "MenuItemId", item.Id }
-        };
+            {
+                { "MenuItemId", item.Id }
+            };
 
             await Shell.Current.GoToAsync(nameof(CustomizationPage), parameters);
         }
+
+        // Used for simple items: Sauces, Sides, Donuts (direct add, no customization page)
+        [RelayCommand]
+        private async Task AddToLogDirectAsync(MenuItem item)
+        {
+            if (item == null)
+                return;
+
+            var loggedItem = new LoggedItem
+            {
+                MenuItemId = item.Id,
+                LoggedAt = DateTime.Now,
+                Quantity = 1,
+                NameOverride = item.Name,
+                CaloriesOverride = item.Calories,
+                ProteinOverride = (decimal)item.Protein,
+                CarbsOverride = (decimal)item.Carbs,
+                FatOverride = (decimal)item.Fat,
+                SodiumOverride = item.Sodium
+            };
+
+            await _repository.InsertLoggedItemAsync(loggedItem);
+
+            await Shell.Current.DisplayAlert(
+                "Added",
+                $"{item.Name} added to today's log.",
+                "OK");
+        }
     }
 }
+
