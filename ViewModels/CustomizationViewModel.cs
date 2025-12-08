@@ -37,6 +37,7 @@ namespace FastTrak.ViewModels
         [ObservableProperty]
         private int quantity = 1;
 
+        // All selectable options grouped by category (e.g. MilkType, Sauces)
         public ObservableCollection<OptionGroup> OptionGroups { get; set; } = new();
 
         public CustomizationViewModel(NutritionRepository repo)
@@ -44,11 +45,13 @@ namespace FastTrak.ViewModels
             _repo = repo;
         }
 
+        // Receives query parameters from Shell navigation
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             MenuItemId = (int)query["MenuItemId"];
         }
 
+        // Load base menu item + custom options
         public async Task LoadAsync()
         {
             var item = await _repo.GetMenuItemAsync(MenuItemId);
@@ -80,8 +83,12 @@ namespace FastTrak.ViewModels
                         {
                             if (e.PropertyName == nameof(SelectableOption.IsSelected))
                             {
-                                // Notify UI that TotalNutritionText must refresh
                                 OnPropertyChanged(nameof(TotalNutritionText));
+                                OnPropertyChanged(nameof(TotalCalories));
+                                OnPropertyChanged(nameof(TotalProtein));
+                                OnPropertyChanged(nameof(TotalCarbs));
+                                OnPropertyChanged(nameof(TotalFat));
+                                OnPropertyChanged(nameof(TotalSodium));
                             }
                         };
 
@@ -98,13 +105,23 @@ namespace FastTrak.ViewModels
             OptionGroups.Clear();
             foreach (var group in grouped)
                 OptionGroups.Add(group);
+
+            // Notify UI that base + totals are now available
+            OnPropertyChanged(nameof(BaseNutritionText));
+            OnPropertyChanged(nameof(TotalNutritionText));
         }
 
+        // Quantity buttons
         [RelayCommand]
         private void IncreaseQuantity()
         {
             Quantity++;
             OnPropertyChanged(nameof(TotalNutritionText));
+            OnPropertyChanged(nameof(TotalCalories));
+            OnPropertyChanged(nameof(TotalProtein));
+            OnPropertyChanged(nameof(TotalCarbs));
+            OnPropertyChanged(nameof(TotalFat));
+            OnPropertyChanged(nameof(TotalSodium));
         }
 
         [RelayCommand]
@@ -114,9 +131,15 @@ namespace FastTrak.ViewModels
             {
                 Quantity--;
                 OnPropertyChanged(nameof(TotalNutritionText));
+                OnPropertyChanged(nameof(TotalCalories));
+                OnPropertyChanged(nameof(TotalProtein));
+                OnPropertyChanged(nameof(TotalCarbs));
+                OnPropertyChanged(nameof(TotalFat));
+                OnPropertyChanged(nameof(TotalSodium));
             }
         }
 
+        // ADD TO LOG: freeze the final macros into LoggedItem override fields
         [RelayCommand]
         private async Task AddToLog()
         {
@@ -124,12 +147,20 @@ namespace FastTrak.ViewModels
             {
                 MenuItemId = MenuItemId,
                 LoggedAt = DateTime.Now,
-                Quantity = Quantity
+                Quantity = Quantity,
+
+                // Important: set name + macros so Home/Calculator can display them
+                NameOverride = ItemName,
+                CaloriesOverride = TotalCalories,
+                ProteinOverride = (decimal)TotalProtein,
+                CarbsOverride = (decimal)TotalCarbs,
+                FatOverride = (decimal)TotalFat,
+                SodiumOverride = TotalSodium
             };
 
             await _repo.InsertLoggedItemAsync(loggedItem);
 
-            // Insert selected options
+            // Insert selected options for this log entry
             foreach (var group in OptionGroups)
             {
                 foreach (var opt in group.Options.Where(o => o.IsSelected))
