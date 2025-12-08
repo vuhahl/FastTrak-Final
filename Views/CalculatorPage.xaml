@@ -13,8 +13,8 @@
 
                 <Frame.Background>
                     <LinearGradientBrush EndPoint="0,1">
-                        <GradientStop Color="{StaticResource AccentColor}" Offset="0.0"/>
-                        <GradientStop Color="{StaticResource BackgroundColor}" Offset="1.0"/>
+                        <GradientStop Color="{StaticResource PrimaryColor}" Offset="0.0"/>
+                        <GradientStop Color="{StaticResource InfoColor}" Offset="1.0"/>
                     </LinearGradientBrush>
                 </Frame.Background>
 
@@ -27,7 +27,7 @@
                            TextColor="White" />
 
                     <!-- Figma-style macro grid -->
-                    <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="20">
+                    <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="18">
 
                         <!-- Calories -->
                         <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
@@ -139,8 +139,8 @@
 
                 <!-- Clear All Button -->
             <Button Text="Clear Today's Log"
-                    BackgroundColor="{StaticResource Secondary}"
-                    TextColor="White"
+                    BackgroundColor="{StaticResource InfoColor}"
+                    TextColor="Black"
                     FontSize="18"
                     Padding="14"
                     CornerRadius="14"

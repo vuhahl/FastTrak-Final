@@ -49,7 +49,7 @@ namespace FastTrak.ViewModels
             _repo = repo;
         }
 
-        // I extract navigation parameters (MenuItemId)
+        // extract navigation parameters (MenuItemId)
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             MenuItemId = (int)query["MenuItemId"];
@@ -58,7 +58,7 @@ namespace FastTrak.ViewModels
         // MAIN LOAD METHOD — loads base item and attaches appropriate options
         public async Task LoadAsync()
         {
-            // Load base menu item
+            // load the base menu item first - figure out what category it belongs to.
             var item = await _repo.GetMenuItemAsync(MenuItemId);
 
             ItemName = item.Name;
@@ -69,29 +69,39 @@ namespace FastTrak.ViewModels
             BaseFat = (decimal)item.Fat;
             BaseSodium = item.Sodium;
 
-           
+            // load ALL CustomOptions mapped to this MenuItemId.
+            // This returns CustomOption objects, NOT MenuItemOption join rows.
             var allOptions = await _repo.GetCustomOptionsForMenuItemAsync(MenuItemId);
 
-            IEnumerable<MenuItemOption> filteredOptions = (IEnumerable<MenuItemOption>)allOptions;
+            //  standardize the category for safe comparison.
+            string category = (item.Category ?? "").Trim().ToLower();
 
-            // Normalize category text so spelling variants don't break logic
-            string category = item.Category?.Trim().ToLower() ?? "";
+            IEnumerable<CustomOption> filteredOptions = allOptions;
+
 
             if (category == "sandwich")
             {
-                //  ONLY include "Topping" for sandwiches
-                filteredOptions = (IEnumerable<MenuItemOption>)allOptions.Where(o => o.Category == "Topping");
+                filteredOptions = allOptions.Where(o =>
+                    (o.Category ?? "").Equals("Topping", StringComparison.OrdinalIgnoreCase));
             }
             else if (category == "burger")
             {
-                // ONLY include "BurgerTopping" for burgers
-                filteredOptions = (IEnumerable<MenuItemOption>)allOptions.Where(o => o.Category == "BurgerTopping");
+                filteredOptions = allOptions.Where(o =>
+                    (o.Category ?? "").Equals("BurgerTopping", StringComparison.OrdinalIgnoreCase));
             }
-            // Wings, Donuts, Beverages, etc. → no filtering required
 
-            // -----------------------------
-            // GROUP OPTIONS FOR UI
-            // -----------------------------
+            // ============================
+            // GROUP OPTIONS FOR UI DISPLAY
+            // ============================
+            //
+            // group CustomOptions by their Category ("Topping", "MilkType", etc.)
+            // and convert them into Observable SelectableOption objects.
+            //
+            // Each SelectableOption has a PropertyChanged listener so macros
+            // automatically update when a checkbox is toggled.
+            //
+            // ============================
+
             var grouped = filteredOptions
                 .GroupBy(o => o.Category)
                 .Select(g =>
@@ -100,10 +110,9 @@ namespace FastTrak.ViewModels
 
                     foreach (var optModel in g)
                     {
-                        // I create a selectable wrapper (holds IsSelected & Model)
                         var opt = new SelectableOption(optModel);
 
-                        // I wire up live macro recalculation when a checkbox toggles
+                        // I subscribe to IsSelected changes so totals recalc instantly.
                         opt.PropertyChanged += (s, e) =>
                         {
                             if (e.PropertyName == nameof(SelectableOption.IsSelected))
@@ -127,12 +136,15 @@ namespace FastTrak.ViewModels
                     };
                 });
 
-            // Clear and repopulate groups
+            // ============================
+            // APPLY GROUPS TO VIEW
+            // ============================
+
             OptionGroups.Clear();
             foreach (var group in grouped)
                 OptionGroups.Add(group);
 
-            // Notify UI that base nutrition + totals are available
+            // I signal to the UI that everything is ready to display.
             OnPropertyChanged(nameof(BaseNutritionText));
             OnPropertyChanged(nameof(TotalNutritionText));
         }
