@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="FastTrak.Views.RestaurantsPage"
              xmlns:models="clr-namespace:FastTrak.Models"
+             xmlns:controls="clr-namespace:FastTrak.Controls"
              Title="RestaurantsPage">
     <VerticalStackLayout Padding="16" Spacing="12">
 
@@ -31,6 +32,8 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+
+        <controls:AdBanner Margin="0,10,0,0" />
 
     </VerticalStackLayout>
 

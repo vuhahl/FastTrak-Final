@@ -4,6 +4,9 @@ using FastTrak.ViewModels;
 using FastTrak.Views;
 using Microsoft.Extensions.Logging;
 using MenuItem = FastTrak.Models.MenuItem;
+using FastTrak.Controls; //for admob rendering
+using Microsoft.Maui.Controls.Compatibility;
+using Microsoft.Maui.Controls.Compatibility.Hosting;
 
 namespace FastTrak
 {
@@ -40,6 +43,17 @@ namespace FastTrak
             builder.Services.AddSingleton<FatSecretService>();
             builder.Services.AddTransient<FatSecretSearchPage>();
             builder.Services.AddTransient<CalculatorPage>();
+
+            //google admob
+            builder
+                    .UseMauiApp<App>()
+                    .UseMauiCompatibility()
+                    .ConfigureMauiHandlers(handlers =>
+                    {
+                #if ANDROID
+                        handlers.AddCompatibilityRenderer(typeof(AdBanner), typeof(FastTrak.Controls.AdBannerRenderer));
+                #endif
+                    });
 
 
             return builder.Build();

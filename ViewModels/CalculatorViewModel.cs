@@ -28,9 +28,8 @@ namespace FastTrak.ViewModels
 
         public async Task LoadAsync()
         {
-            TodayLoggedItems.Clear();
-
             var items = await _repo.GetLoggedItemsForTodayAsync();
+            TodayLoggedItems.Clear();
             foreach (var item in items)
                 TodayLoggedItems.Add(item);
 
