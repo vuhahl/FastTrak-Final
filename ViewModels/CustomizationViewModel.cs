@@ -79,12 +79,14 @@ namespace FastTrak.ViewModels
             IEnumerable<CustomOption> filteredOptions = allOptions;
 
 
-            if (category == "sandwich")
+            // Sandwiches → only "Topping"
+            if (category == "sandwich" || category == "sandwiches")
             {
                 filteredOptions = allOptions.Where(o =>
                     (o.Category ?? "").Equals("Topping", StringComparison.OrdinalIgnoreCase));
             }
-            else if (category == "burger")
+            // Burgers → only "BurgerTopping"
+            else if (category == "burger" || category == "burgers")
             {
                 filteredOptions = allOptions.Where(o =>
                     (o.Category ?? "").Equals("BurgerTopping", StringComparison.OrdinalIgnoreCase));

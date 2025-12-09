@@ -46,6 +46,54 @@ namespace FastTrak.ViewModels
             TotalSodium = TodayLoggedItems.Sum(i => i.SodiumOverride * i.Quantity);
         }
 
+        // Increase quantity of an item in the calculator
+        [RelayCommand]
+        private async Task IncreaseItemQuantityAsync(LoggedItem item)
+        {
+            if (item == null) return;
+
+            item.Quantity++;
+            await _repo.UpdateLoggedItemAsync(item);
+
+            // Recalculate totals after change
+            RecalculateTotals();
+        }
+
+        // Decrease quantity of an item in the calculator
+        [RelayCommand]
+        private async Task DecreaseItemQuantityAsync(LoggedItem item)
+        {
+            if (item == null) return;
+            if (item.Quantity <= 1) return; // don't go below 1
+
+            item.Quantity--;
+            await _repo.UpdateLoggedItemAsync(item);
+
+            RecalculateTotals();
+        }
+
+        // Remove a single item from the calculator
+        [RelayCommand]
+        private async Task RemoveItemAsync(LoggedItem item)
+        {
+            if (item == null) return;
+
+            // Optional confirm dialog (can remove if you want silent delete)
+            bool confirm = await Shell.Current.DisplayAlert(
+                "Remove Item",
+                $"Remove {item.DisplayName} from today's log?",
+                "Remove",
+                "Cancel");
+
+            if (!confirm) return;
+
+            await _repo.DeleteLoggedItemAsync(item.Id);
+            TodayLoggedItems.Remove(item);
+
+            RecalculateTotals();
+        }
+
+
         [RelayCommand]
         private async Task ClearAllAsync()
         {

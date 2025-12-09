@@ -7,6 +7,8 @@
 
     <ScrollView>
         <VerticalStackLayout Padding="24" Spacing="20">
+
+            <!-- TOP SUMMARY CARD -->
             <Frame CornerRadius="20"
                    Padding="20"
                    HasShadow="True">
@@ -26,10 +28,9 @@
                            FontAttributes="Bold"
                            TextColor="White" />
 
-                    <!-- Figma-style macro grid -->
+                    <!-- Macro Grid -->
                     <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="18">
 
-                        <!-- Calories -->
                         <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
                             <Label Text="{Binding TotalCalories}"
                                    FontSize="26"
@@ -40,7 +41,6 @@
                                    TextColor="#FFEFEFEF" />
                         </VerticalStackLayout>
 
-                        <!-- Protein -->
                         <VerticalStackLayout Grid.Column="1" Spacing="4" HorizontalOptions="Center">
                             <Label Text="{Binding TotalProtein}"
                                    FontSize="26"
@@ -51,7 +51,6 @@
                                    TextColor="#FFEFEFEF" />
                         </VerticalStackLayout>
 
-                        <!-- Carbs -->
                         <VerticalStackLayout Grid.Column="2" Spacing="4" HorizontalOptions="Center">
                             <Label Text="{Binding TotalCarbs}"
                                    FontSize="26"
@@ -62,7 +61,6 @@
                                    TextColor="#FFEFEFEF" />
                         </VerticalStackLayout>
 
-                        <!-- Fat -->
                         <VerticalStackLayout Grid.Column="3" Spacing="4" HorizontalOptions="Center">
                             <Label Text="{Binding TotalFat}"
                                    FontSize="26"
@@ -74,14 +72,13 @@
                         </VerticalStackLayout>
 
                     </Grid>
-
                 </VerticalStackLayout>
-
             </Frame>
 
 
+
             <!-- ===================== -->
-            <!--   M Y   T R A Y   -->
+            <!--   M Y   T R A Y       -->
             <!-- ===================== -->
 
             <CollectionView ItemsSource="{Binding TodayLoggedItems}"
@@ -96,48 +93,86 @@
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
+
                         <Frame Padding="16"
-               Margin="0,8"
-               CornerRadius="16"
-               BackgroundColor="{StaticResource SurfaceColor}"
-               HasShadow="False">
+                               Margin="0,8"
+                               CornerRadius="16"
+                               BackgroundColor="{StaticResource SurfaceColor}"
+                               HasShadow="False">
 
-                            <VerticalStackLayout Spacing="8">
+                            <VerticalStackLayout Spacing="10">
 
-                                <!-- Name + Remove button -->
+                                <!-- Name + Remove -->
                                 <Grid ColumnDefinitions="*,Auto">
 
                                     <Label Text="{Binding DisplayName}"
-                           FontSize="16"
-                           FontAttributes="Bold"
-                           TextColor="{StaticResource TextPrimaryColor}" />
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimaryColor}" />
 
+                                    <!-- UPDATED REMOVE BUTTON -->
                                     <Button Grid.Column="1"
-                            Text="Remove"
-                            BackgroundColor="Transparent"
-                            TextColor="{StaticResource TextSecondaryColor}"
-                            FontSize="13"
-                            Padding="0"
-                            Command="{Binding BindingContext.DeleteLoggedItemCommand, Source={x:Reference CalculatorPageRoot}}"
-                            CommandParameter="{Binding .}" />
+                                            Text="Remove"
+                                            BackgroundColor="Transparent"
+                                            TextColor="{StaticResource TextSecondaryColor}"
+                                            FontSize="13"
+                                            Padding="0"
+                                            Command="{Binding 
+                                                BindingContext.RemoveItemCommand,
+                                                Source={x:Reference CalculatorPageRoot}}"
+                                            CommandParameter="{Binding .}" />
+
                                 </Grid>
 
                                 <!-- Calories -->
                                 <Label Text="{Binding CaloriesOverride, StringFormat='Calories: {0}'}"
-                       TextColor="{StaticResource TextSecondaryColor}" />
+                                       TextColor="{StaticResource TextSecondaryColor}" />
 
-                                <!-- Qty -->
-                                <Label Text="{Binding Quantity, StringFormat='Qty: {0}'}"
-                       TextColor="{StaticResource TextSecondaryColor}" />
+                                <!-- Quantity Control Row -->
+                                <Grid ColumnDefinitions="Auto,Auto,Auto"
+                                      ColumnSpacing="12">
+
+                                    <!-- Decrease -->
+                                    <Button Text="-"
+                                            WidthRequest="32"
+                                            HeightRequest="32"
+                                            CornerRadius="16"
+                                            BackgroundColor="{StaticResource PrimaryColor}"
+                                            TextColor="White"
+                                            Command="{Binding 
+                                                BindingContext.DecreaseItemQuantityCommand,
+                                                Source={x:Reference CalculatorPageRoot}}"
+                                            CommandParameter="{Binding .}" />
+
+                                    <!-- Quantity Display -->
+                                    <Label Text="{Binding Quantity}"
+                                           VerticalOptions="Center"
+                                           FontSize="16"
+                                           TextColor="{StaticResource TextPrimaryColor}" />
+
+                                    <!-- Increase -->
+                                    <Button Text="+"
+                                            WidthRequest="32"
+                                            HeightRequest="32"
+                                            CornerRadius="16"
+                                            BackgroundColor="{StaticResource PrimaryColor}"
+                                            TextColor="White"
+                                            Command="{Binding 
+                                                BindingContext.IncreaseItemQuantityCommand,
+                                                Source={x:Reference CalculatorPageRoot}}"
+                                            CommandParameter="{Binding .}" />
+                                </Grid>
 
                             </VerticalStackLayout>
                         </Frame>
+
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
-                </CollectionView>
+
+            </CollectionView>
 
 
-                <!-- Clear All Button -->
+            <!-- CLEAR ALL -->
             <Button Text="Clear Today's Log"
                     BackgroundColor="{StaticResource InfoColor}"
                     TextColor="Black"
