@@ -3,10 +3,11 @@ using FastTrak.Services;
 using FastTrak.ViewModels;
 using FastTrak.Views;
 using Microsoft.Extensions.Logging;
-using MenuItem = FastTrak.Models.MenuItem;
-using FastTrak.Controls; //for admob rendering
 using Microsoft.Maui.Controls.Compatibility;
 using Microsoft.Maui.Controls.Compatibility.Hosting;
+using Plugin.MauiMTAdmob;
+using MenuItem = FastTrak.Models.MenuItem;
+
 
 namespace FastTrak
 {
@@ -18,6 +19,7 @@ namespace FastTrak
 
             builder
                 .UseMauiApp<App>()
+                .UseMauiMTAdmob()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -44,16 +46,7 @@ namespace FastTrak
             builder.Services.AddTransient<FatSecretSearchPage>();
             builder.Services.AddTransient<CalculatorPage>();
 
-            //google admob
-            builder
-                    .UseMauiApp<App>()
-                    .UseMauiCompatibility()
-                    .ConfigureMauiHandlers(handlers =>
-                    {
-                #if ANDROID
-                        handlers.AddCompatibilityRenderer(typeof(AdBanner), typeof(FastTrak.Controls.AdBannerRenderer));
-                #endif
-                    });
+            
 
 
             return builder.Build();
