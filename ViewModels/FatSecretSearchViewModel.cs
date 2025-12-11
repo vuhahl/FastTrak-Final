@@ -7,6 +7,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,10 +35,28 @@ namespace FastTrak.ViewModels
         public async Task SearchAsync()
         {
             Results.Clear();
-            var items = await _service.SearchFoodsAsync(Query);
 
-            foreach (var item in items)
-                Results.Add(item);
+            if (string.IsNullOrWhiteSpace(Query))
+            {
+                await Shell.Current.DisplayAlert("Missing search", "Enter a food to search.", "OK");
+                return;
+            }
+
+            try
+            {
+                var items = await _service.SearchFoodsAsync(Query);
+
+                foreach (var item in items)
+                    Results.Add(item);
+
+                if (Results.Count == 0)
+                    await Shell.Current.DisplayAlert("No results", "Try another term.", "OK");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"FatSecret Error: {ex}");
+                await Shell.Current.DisplayAlert("Error", "Unable to load results.", "OK");
+            }
         }
 
         [RelayCommand]
@@ -58,7 +77,6 @@ namespace FastTrak.ViewModels
                 ProteinOverride = (decimal)s.protein,
                 CarbsOverride = (decimal)s.carbohydrate,
                 FatOverride = (decimal)s.fat,
-                SodiumOverride = (int)s.sodium
             };
 
             await _repo.InsertLoggedItemAsync(logged);
