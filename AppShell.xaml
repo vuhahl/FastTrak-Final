@@ -16,14 +16,14 @@
 
         <!-- RESTAURANTS PAGE -->
         <ShellContent
-            Title="Restaurants"
+            Title="Menu"
             ContentTemplate="{DataTemplate views:RestaurantsPage}"
             Route="RestaurantsPage" />
 
        
         <!-- CALCULATOR PAGE -->
         <ShellContent
-            Title="Calculator"
+            Title="My Tray"
             ContentTemplate="{DataTemplate views:CalculatorPage}"
             Route="CalculatorPage" />
 
