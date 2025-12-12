@@ -114,13 +114,24 @@ namespace FastTrak.Data
                       .ToListAsync();
         }
 
-        public Task<int> GetTodaySelectionCountAsync()
+
+        public async Task<List<LoggedItem>> GetLoggedItemsForTodayAsync()
         {
             var today = DateTime.Today;
 
-            return _db.Table<LoggedItem>()
-                      .Where(x => x.LoggedAt >= today)
-                      .CountAsync();
+            var items = await _db.Table<LoggedItem>()
+                                 .Where(x => x.LoggedAt >= today)
+                                 .ToListAsync();
+
+            
+            foreach (var item in items)
+            {
+                item.Options = await _db.Table<LoggedItemOption>()
+                                        .Where(o => o.LoggedItemId == item.Id)
+                                        .ToListAsync();
+            }
+
+            return items;
         }
 
         public Task<List<MenuItem>> GetMenuItemsForRestaurantAsync(int restaurantId)
@@ -150,15 +161,7 @@ namespace FastTrak.Data
             return _db.DeleteAsync<LoggedItem>(id);
         }
 
-        public Task<List<LoggedItem>> GetLoggedItemsForTodayAsync()
-        {
-            var today = DateTime.Today;
-
-            return _db.Table<LoggedItem>()
-                      .Where(x => x.LoggedAt >= today)
-                      .OrderBy(x => x.LoggedAt)
-                      .ToListAsync();
-        }
+        
 
         // get the custom options for a given menu item
         public async Task<List<CustomOption>> GetCustomOptionsForMenuItemAsync(int menuItemId)
@@ -175,12 +178,12 @@ namespace FastTrak.Data
         }
 
         //Insert option logs
-        public Task<int> InsertLoggedItemOptionAsync(int loggedItemId, int optionId) =>
-    _db.InsertAsync(new LoggedItemOption
-    {
-        LoggedItemId = loggedItemId,
-        CustomOptionId = optionId
-    });
+
+        //added 12/12 to account for the new LoggedItemOption model and calc customization macros
+        public Task InsertLoggedItemOptionAsync(LoggedItemOption option)
+        {
+            return _db.InsertAsync(option);
+        }
 
 
 

@@ -39,6 +39,7 @@ namespace FastTrak.ViewModels
         private async Task SearchAsync()
         {
             if (IsSearching) return;
+            
 
             Results.Clear();
             HasSearched = false;
@@ -81,49 +82,6 @@ namespace FastTrak.ViewModels
             }
         }
 
-        private static bool TryParseIntInvariant(string s, out int value)
-        {
-            return int.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out value);
-        }
-
-        private static bool TryParseDoubleInvariant(string s, out double value)
-        {
-            return double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out value);
-        }
-
-        /// <summary>
-        /// Normalizes FatSecret "servings.serving" which can be an object or an array.
-        /// Picks the first serving if multiple exist.
-        /// </summary>
-        private static FatSecretServing GetPrimaryServing(FatSecretFoodDetails details)
-        {
-            if (details?.food?.servings == null) return null;
-
-            var el = details.food.servings.serving;
-
-            try
-            {
-                if (el.ValueKind == JsonValueKind.Object)
-                {
-                    return JsonSerializer.Deserialize<FatSecretServing>(el.GetRawText());
-                }
-
-                if (el.ValueKind == JsonValueKind.Array)
-                {
-                    if (el.GetArrayLength() == 0) return null;
-                    var first = el[0];
-                    return JsonSerializer.Deserialize<FatSecretServing>(first.GetRawText());
-                }
-
-                return null;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[FatSecret] Serving normalize error: {ex}");
-                return null;
-            }
-        }
-
         [RelayCommand]
         private async Task AddToLogAsync(FatSecretFoodSearchItem item)
         {
@@ -134,8 +92,8 @@ namespace FastTrak.ViewModels
                 Debug.WriteLine($"[FatSecret] Getting details for food_id: {item.food_id}");
 
                 var details = await _service.GetFoodDetailsAsync(item.food_id);
-
                 var s = GetPrimaryServing(details);
+
                 if (s == null)
                 {
                     await Shell.Current.DisplayAlert("Unavailable",
@@ -185,6 +143,44 @@ namespace FastTrak.ViewModels
             Query = string.Empty;
             Results.Clear();
             HasSearched = false;
+        }
+
+        private static bool TryParseIntInvariant(string s, out int value)
+        {
+            return int.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out value);
+        }
+
+        private static bool TryParseDoubleInvariant(string s, out double value)
+        {
+            return double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out value);
+        }
+
+        private static FatSecretServing GetPrimaryServing(FatSecretFoodDetails details)
+        {
+            if (details?.food?.servings == null) return null;
+
+            var el = details.food.servings.serving;
+
+            try
+            {
+                if (el.ValueKind == JsonValueKind.Object)
+                {
+                    return JsonSerializer.Deserialize<FatSecretServing>(el.GetRawText());
+                }
+
+                if (el.ValueKind == JsonValueKind.Array && el.GetArrayLength() > 0)
+                {
+                    var first = el[0];
+                    return JsonSerializer.Deserialize<FatSecretServing>(first.GetRawText());
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[FatSecret] Serving normalize error: {ex}");
+                return null;
+            }
         }
     }
 }

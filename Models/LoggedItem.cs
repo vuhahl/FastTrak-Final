@@ -27,6 +27,10 @@ namespace FastTrak.Models
 
         public DateTime LoggedAt { get; set; } = DateTime.Now;
 
+        [Ignore]
+        public List<LoggedItemOption> Options { get; set; } = new();
+
+
         // Computed properties for display
         public string DisplayName =>
             string.IsNullOrWhiteSpace(NameOverride)

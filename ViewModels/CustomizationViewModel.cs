@@ -206,11 +206,22 @@ namespace FastTrak.ViewModels
             foreach (var group in OptionGroups)
             {
                 foreach (var opt in group.Options.Where(o => o.IsSelected))
-                    await _repo.InsertLoggedItemOptionAsync(loggedItem.Id, opt.Id);
-            }
+                {
+                    var loggedOption = new LoggedItemOption
+                    {
+                        LoggedItemId = loggedItem.Id,
+                        CustomOptionId = opt.Id,
+                        OptionName = opt.Name,
+                        Calories = opt.Calories,
+                        Protein = opt.Protein,
+                        Carbs = opt.Carbs,
+                        Fat = opt.Fat,
+                        Sodium = opt.Sodium
+                    };
 
-            await Shell.Current.DisplayAlert("Success", "Item added to your log.", "OK");
-            await Shell.Current.GoToAsync("..");
+                    await _repo.InsertLoggedItemOptionAsync(loggedOption);
+                }
+            }
         }
 
 

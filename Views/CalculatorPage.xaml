@@ -9,6 +9,13 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
 
+            <!-- HEADER -->
+            <Label Text="My Tray"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   TextColor="#1A1A1A"/>
+
+
             <!-- TOP SUMMARY CARD -->
             <Frame CornerRadius="16"
                    Padding="20"
@@ -157,6 +164,25 @@
                                                 Source={x:Reference CalculatorPageRoot}}"
                                             CommandParameter="{Binding .}" />
                                 </Grid>
+
+                                <!-- Customization Options -->
+                                <CollectionView ItemsSource="{Binding Options}"
+                                    HeightRequest="Auto"
+                                    Margin="0,-4,0,0"
+                                    IsVisible="{Binding Options.Count, Converter={StaticResource GreaterThanZeroConverter}}"
+                                    SelectionMode="None">
+
+                                                        <CollectionView.ItemTemplate>
+                                                            <DataTemplate>
+                                            <Label Text="• {Binding OptionName}"
+                                       FontSize="13"
+                                       TextColor="#6B7280"
+                                       LineBreakMode="WordWrap"
+                                       Margin="0,-6,0,-2"/>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+
+                                </CollectionView>
 
                                 <!-- Macros Display Grid -->
                                 <Grid ColumnDefinitions="*,*,*,*" 

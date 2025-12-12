@@ -5,18 +5,22 @@
     xmlns:views="clr-namespace:FastTrak.Views"
     Shell.FlyoutBehavior="Disabled"
     Title="FastTrak">
+    
+    
 
     <TabBar>
 
         <!-- HOME SCREEN -->
-        <ShellContent
+        <ShellContent 
             Title="Home"
+            Icon="home.png"
             ContentTemplate="{DataTemplate views:HomePage}"
             Route="HomePage" />
 
         <!-- RESTAURANTS PAGE -->
         <ShellContent
             Title="Menu"
+            Icon="menufood.png"
             ContentTemplate="{DataTemplate views:RestaurantsPage}"
             Route="RestaurantsPage" />
 
@@ -24,8 +28,10 @@
         <!-- CALCULATOR PAGE -->
         <ShellContent
             Title="My Tray"
+            Icon="calculator.png"
             ContentTemplate="{DataTemplate views:CalculatorPage}"
             Route="CalculatorPage" />
+
 
     </TabBar>
 

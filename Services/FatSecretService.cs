@@ -33,8 +33,8 @@ namespace FastTrak.Services
 
         public FatSecretService(
             HttpClient httpClient = null,
-            string clientId = "YOUR_CLIENT_ID_HERE",
-            string clientSecret = "YOUR_CLIENT_SECRET_HERE")
+            string clientId = "a4c9b42e86d44062bd0bcad7c04b3e14",
+            string clientSecret = "95b2a27d07fc4350a815a17496791662")
         {
             _http = httpClient ?? new HttpClient();
             _clientId = clientId ?? string.Empty;
@@ -108,50 +108,74 @@ namespace FastTrak.Services
             return _accessToken;
         }
 
+
+
         /// <summary>
-        /// Searches for foods using FatSecret foods.search v1 API.
+        /// Searches for foods using FatSecret foods.search v1 API. Test as of 12-11-25
         /// </summary>
-        public async Task<List<FatSecretFoodSearchItem>> SearchFoodsAsync(
-            string query,
-            int maxResults = 20,
-            int pageNumber = 0,
-            CancellationToken ct = default)
+        public async Task<List<FatSecretFoodSearchItem>> SearchFoodsAsync(string query, int maxResults = 20)
         {
-            if (string.IsNullOrWhiteSpace(query))
-                return new List<FatSecretFoodSearchItem>();
+            var result = new List<FatSecretFoodSearchItem>();
 
-            query = query.Trim();
-            var token = await GetAccessTokenAsync(ct);
+            string token;
+            try
+            {
+                token = await GetAccessTokenAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[FatSecret] ❌ Token error: {ex.Message}");
+                return result;
+            }
 
-            var url =
-                $"https://platform.fatsecret.com/rest/foods/search/v1" +
-                $"?format=json" +
-                $"&max_results={maxResults}" +
-                $"&page_number={pageNumber}" +
-                $"&search_expression={Uri.EscapeDataString(query)}";
+            var url = $"https://platform.fatsecret.com/rest/server.api?method=foods.search&search_expression={Uri.EscapeDataString(query)}&format=json&max_results={maxResults}";
 
-            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            Log($"GET {url}");
+            Debug.WriteLine($"[FatSecret] 🔍 Sending request to: {url}");
 
-            using var response = await _http.SendAsync(request, ct);
-            var content = await response.Content.ReadAsStringAsync(ct);
+            var response = await _http.SendAsync(request);
+            var json = await response.Content.ReadAsStringAsync();
 
-            Log($"foods.search status: {(int)response.StatusCode} {response.StatusCode}");
-            Log($"foods.search body: {Truncate(content)}");
+            Debug.WriteLine($"[FatSecret] 🌐 Status: {response.StatusCode}");
+            Debug.WriteLine($"[FatSecret] 📄 Raw JSON: {json}");
 
             if (!response.IsSuccessStatusCode)
-                throw new Exception($"foods.search failed: {response.StatusCode} - {content}");
+                return result;
 
-            var result = JsonSerializer.Deserialize<FatSecretSearchResponse>(content, JsonOptions);
+            using var doc = JsonDocument.Parse(json);
 
-            // If status is 200 but schema differs / account returns error JSON, don't silently return [].
-            if (result?.foods == null)
-                throw new Exception($"foods.search returned unexpected JSON (foods is null). Body: {Truncate(content)}");
+            try
+            {
+                if (doc.RootElement.TryGetProperty("foods", out var foodsObj) &&
+                    foodsObj.TryGetProperty("food", out var foodArray))
+                {
+                    if (foodArray.ValueKind == JsonValueKind.Object)
+                    {
+                        result.Add(JsonSerializer.Deserialize<FatSecretFoodSearchItem>(foodArray.GetRawText()));
+                    }
+                    else if (foodArray.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var food in foodArray.EnumerateArray())
+                        {
+                            result.Add(JsonSerializer.Deserialize<FatSecretFoodSearchItem>(food.GetRawText()));
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.WriteLine("[FatSecret] ⚠️ No 'foods.food' array found in response.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[FatSecret] ❌ JSON parse error: {ex}");
+            }
 
-            return result.foods.food ?? new List<FatSecretFoodSearchItem>();
+            return result;
         }
+
 
         /// <summary>
         /// Gets detailed nutrition info for a specific food (food.get).
