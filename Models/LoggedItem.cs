@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
 using SQLite;
 
 namespace FastTrak.Models
 {
-    public class LoggedItem
+    public partial class LoggedItem : ObservableObject 
     {
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
@@ -22,8 +23,9 @@ namespace FastTrak.Models
         public decimal FatOverride { get; set; }
         public int SodiumOverride { get; set; }
 
-
-        public int Quantity { get; set; } = 1;
+        // CHANGED: Make Quantity observable
+        [ObservableProperty]
+        private int quantity = 1;
 
         public DateTime LoggedAt { get; set; } = DateTime.Now;
 
@@ -38,6 +40,7 @@ namespace FastTrak.Models
                 : NameOverride;
 
         public int DisplayCalories => CaloriesOverride;
+
 
     }
 }

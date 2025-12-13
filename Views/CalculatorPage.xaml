@@ -9,16 +9,9 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="20">
 
-            <!-- HEADER -->
-            <Label Text="My Tray"
-                   FontSize="28"
-                   FontAttributes="Bold"
-                   TextColor="#1A1A1A"/>
-
-
             <!-- TOP SUMMARY CARD -->
             <Frame CornerRadius="16"
-                   Padding="20"
+                   Padding="21"
                    HasShadow="True"
                    BorderColor="Transparent">
 
@@ -29,11 +22,12 @@
                     </LinearGradientBrush>
                 </Frame.Background>
 
-                <VerticalStackLayout Spacing="20">
+                <VerticalStackLayout Spacing="18">
 
                     <!-- Title -->
                     <Label Text="Today's Totals"
-                           FontSize="22"
+                           FontSize="25"
+                           HorizontalOptions="Center"
                            FontAttributes="Bold"
                            TextColor="White" />
 
@@ -42,7 +36,7 @@
 
                         <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
                             <Label Text="{Binding TotalCalories}"
-                                   FontSize="28"
+                                   FontSize="26"
                                    FontAttributes="Bold"
                                    TextColor="White" />
                             <Label Text="Calories"
@@ -51,8 +45,8 @@
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Grid.Column="1" Spacing="4" HorizontalOptions="Center">
-                            <Label Text="{Binding TotalProtein, StringFormat='{0:F1}g'}"
-                                   FontSize="28"
+                            <Label Text="{Binding TotalProtein, StringFormat='{0:F0}g'}"
+                                   FontSize="26"
                                    FontAttributes="Bold"
                                    TextColor="White" />
                             <Label Text="Protein"
@@ -61,8 +55,8 @@
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Grid.Column="2" Spacing="4" HorizontalOptions="Center">
-                            <Label Text="{Binding TotalCarbs, StringFormat='{0:F1}g'}"
-                                   FontSize="28"
+                            <Label Text="{Binding TotalCarbs, StringFormat='{0:F0}g'}"
+                                   FontSize="26"
                                    FontAttributes="Bold"
                                    TextColor="White" />
                             <Label Text="Carbs"
@@ -71,8 +65,8 @@
                         </VerticalStackLayout>
 
                         <VerticalStackLayout Grid.Column="3" Spacing="4" HorizontalOptions="Center">
-                            <Label Text="{Binding TotalFat, StringFormat='{0:F1}g'}"
-                                   FontSize="28"
+                            <Label Text="{Binding TotalFat, StringFormat='{0:F0}g'}"
+                                   FontSize="26"
                                    FontAttributes="Bold"
                                    TextColor="White" />
                             <Label Text="Fat"
@@ -165,33 +159,12 @@
                                             CommandParameter="{Binding .}" />
                                 </Grid>
 
-                                <!-- Customization Options -->
-                                <CollectionView ItemsSource="{Binding Options}"
-                                    HeightRequest="Auto"
-                                    Margin="0,-4,0,0"
-                                    IsVisible="{Binding Options.Count, Converter={StaticResource GreaterThanZeroConverter}}"
-                                    SelectionMode="None">
-
-                                                        <CollectionView.ItemTemplate>
-                                                            <DataTemplate>
-                                            <Label Text="• {Binding OptionName}"
-                                       FontSize="13"
-                                       TextColor="#6B7280"
-                                       LineBreakMode="WordWrap"
-                                       Margin="0,-6,0,-2"/>
-                                        </DataTemplate>
-                                    </CollectionView.ItemTemplate>
-
-                                </CollectionView>
-
                                 <!-- Macros Display Grid -->
                                 <Grid ColumnDefinitions="*,*,*,*" 
                                       ColumnSpacing="8"
                                       Padding="12,8"
                                       BackgroundColor="#F9FAFB">
-                                    <Grid.GestureRecognizers>
-                                        <TapGestureRecognizer/>
-                                    </Grid.GestureRecognizers>
+                                    
 
                                     <!-- Calories -->
                                     <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
@@ -208,7 +181,7 @@
 
                                     <!-- Protein -->
                                     <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
-                                        <Label Text="{Binding ProteinOverride, StringFormat='{0:F1}g'}"
+                                        <Label Text="{Binding ProteinOverride, StringFormat='{0:F0}g'}"
                                                FontSize="16"
                                                FontAttributes="Bold"
                                                TextColor="#1A1A1A"
@@ -221,7 +194,7 @@
 
                                     <!-- Carbs -->
                                     <VerticalStackLayout Grid.Column="2" Spacing="2" HorizontalOptions="Center">
-                                        <Label Text="{Binding CarbsOverride, StringFormat='{0:F1}g'}"
+                                        <Label Text="{Binding CarbsOverride, StringFormat='{0:F0}g'}"
                                                FontSize="16"
                                                FontAttributes="Bold"
                                                TextColor="#1A1A1A"
@@ -234,7 +207,7 @@
 
                                     <!-- Fat -->
                                     <VerticalStackLayout Grid.Column="3" Spacing="2" HorizontalOptions="Center">
-                                        <Label Text="{Binding FatOverride, StringFormat='{0:F1}g'}"
+                                        <Label Text="{Binding FatOverride, StringFormat='{0:F0}g'}"
                                                FontSize="16"
                                                FontAttributes="Bold"
                                                TextColor="#1A1A1A"
@@ -275,7 +248,7 @@
                                         <Label Text="{Binding Quantity, StringFormat='Qty: {0}'}"
                                                VerticalOptions="Center"
                                                HorizontalOptions="Center"
-                                               FontSize="15"
+                                               FontSize="13"
                                                FontAttributes="Bold"
                                                TextColor="#1A1A1A" />
                                     </Border>

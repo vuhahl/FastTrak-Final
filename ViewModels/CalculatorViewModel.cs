@@ -54,8 +54,9 @@ namespace FastTrak.ViewModels
             item.Quantity++;
             await _repo.UpdateLoggedItemAsync(item);
 
-            // Recalculate totals after change
+            // NEW
             RecalculateTotals();
+            OnPropertyChanged(nameof(TodayLoggedItems));
         }
 
         // Decrease quantity of an item in the calculator
@@ -63,12 +64,15 @@ namespace FastTrak.ViewModels
         private async Task DecreaseItemQuantityAsync(LoggedItem item)
         {
             if (item == null) return;
-            if (item.Quantity <= 1) return; // don't go below 1
+            if (item.Quantity > 1)
+            {
+                item.Quantity--;
+                await _repo.UpdateLoggedItemAsync(item);
 
-            item.Quantity--;
-            await _repo.UpdateLoggedItemAsync(item);
-
-            RecalculateTotals();
+                // NEW
+                RecalculateTotals();
+                OnPropertyChanged(nameof(TodayLoggedItems));
+            }
         }
 
         // Remove a single item from the calculator

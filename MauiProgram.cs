@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Compatibility;
 using Microsoft.Maui.Controls.Compatibility.Hosting;
 using Plugin.MauiMTAdmob;
+using CommunityToolkit.Mvvm;
 using MenuItem = FastTrak.Models.MenuItem;
 
 
@@ -26,6 +27,8 @@ namespace FastTrak
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                     fonts.AddFont("FluentSystemIcons-Regular.ttf", "FluentIcons");
                 });
+
+
             // Repository (register ONCE)
             builder.Services.AddSingleton<NutritionRepository>();
 
