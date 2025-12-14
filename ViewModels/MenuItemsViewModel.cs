@@ -67,78 +67,103 @@ namespace FastTrak.ViewModels
 
 
         private ObservableCollection<MenuItemGroup> CreateGroups(IEnumerable<MenuItem> items)
-        {
-            // Local buckets — O(1) append operations
+{
+            // Group buckets — each category from seed data properly mapped
             var mains = new List<MenuItem>();
             var sides = new List<MenuItem>();
             var beverages = new List<MenuItem>();
             var sauces = new List<MenuItem>();
             var bakery = new List<MenuItem>();
             var desserts = new List<MenuItem>();
+            var breakfast = new List<MenuItem>();   // FIX: Add explicit bucket for Dunkin breakfast
 
             foreach (var item in items)
             {
+                // Normalize category
                 var cat = item.Category?.ToLowerInvariant() ?? "";
 
-                // MAIN ENTREES
-                if (cat.Contains("wing") ||
-                    cat.Contains("burger") ||
-                    cat.Contains("sandwich") ||
-                    cat.Contains("salad") ||
-                    cat.Contains("breakfast"))
+                // ==========================
+                // MAINS (Burgers, Sandwiches, Salads, Wings)
+                // ==========================
+                if (cat == "burgers" ||
+                    cat == "sandwiches" ||
+                    cat == "salads" ||
+                    cat == "wings")
                 {
                     mains.Add(item);
                     continue;
                 }
 
-                // SIDES
-                if (cat.Contains("side") ||
-                    cat.Contains("fries") ||
-                    cat.Contains("corn"))
+                // ==========================
+                // BREAKFAST (Fix for Dunkin)
+                // ==========================
+                // Previously grouped under "Mains" → but no mains exist for Dunkin → lost entirely
+                if (cat == "breakfast")
+                {
+                    breakfast.Add(item);
+                    continue;
+                }
+
+                // ==========================
+                // SIDES (including potato category)
+                // ==========================
+                if (cat == "sides" ||
+                    cat == "potato")
                 {
                     sides.Add(item);
                     continue;
                 }
 
-                // BEVERAGES
-                if (cat.Contains("beverage") ||
-                    cat.Contains("drink") ||
-                    cat.Contains("coffee") ||
-                    cat.Contains("tea"))
+                // ==========================
+                // BEVERAGES (Coffee / Drinks)
+                // ==========================
+                if (cat == "coffee" ||
+                    cat == "drink" ||
+                    cat == "beverage")
                 {
                     beverages.Add(item);
                     continue;
                 }
 
-                // SAUCES / DIPS
-                if (cat.Contains("sauce") ||
-                    cat.Contains("dip"))
+                // ==========================
+                // SAUCES (Wingstop dips)
+                // ==========================
+                if (cat == "sauces" ||
+                    cat == "sauce")
                 {
                     sauces.Add(item);
                     continue;
                 }
 
-                // BAKERY (DONUTS)
-                if (cat.Contains("donut") ||
-                    cat.Contains("bakery") ||
-                    cat.Contains("pastry"))
+                // ==========================
+                // DONUTS / BAKERY
+                // ==========================
+                if (cat == "donuts")
                 {
                     bakery.Add(item);
                     continue;
                 }
 
+                // ==========================
                 // DESSERTS
-                if (cat.Contains("dessert"))
+                // ==========================
+                if (cat == "desserts")
                 {
                     desserts.Add(item);
                     continue;
                 }
+
+                // ==========================
+                // FALLBACK — no items disappear
+                // ==========================
+                mains.Add(item); // Safe default
             }
 
-            // Build groups ONLY for non-empty buckets
+            // Build groups — only non-empty buckets
             var groups = new ObservableCollection<MenuItemGroup>();
 
             if (mains.Any()) groups.Add(new MenuItemGroup("Mains", mains));
+            if (breakfast.Any()) groups.Add(new MenuItemGroup("Breakfast", breakfast)); // FIXED FOR DUNKIN
             if (sides.Any()) groups.Add(new MenuItemGroup("Sides", sides));
             if (beverages.Any()) groups.Add(new MenuItemGroup("Beverages", beverages));
             if (sauces.Any()) groups.Add(new MenuItemGroup("Sauces", sauces));

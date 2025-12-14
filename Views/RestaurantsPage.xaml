@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="FastTrak.Views.RestaurantsPage"
              xmlns:models="clr-namespace:FastTrak.Models"
-             Shell.NavBarIsVisible="True"
              xmlns:viewmodels="clr-namespace:FastTrak.ViewModels"
              xmlns:admob="clr-namespace:Plugin.MauiMTAdmob.Controls;assembly=Plugin.MauiMTAdmob"
              x:DataType="viewmodels:RestaurantsViewModel">

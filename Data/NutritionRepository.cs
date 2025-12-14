@@ -19,6 +19,7 @@ namespace FastTrak.Data
         {
             var path = Path.Combine(FileSystem.AppDataDirectory, "fasttrak.db3");
             _db = new SQLiteAsyncConnection(path);
+
         }
 
         /// <summary>

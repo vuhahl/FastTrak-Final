@@ -20,7 +20,7 @@
                     <DataTemplate>
                         <Label Text="{Binding Title}"
                                FontSize="22"
-                               FontAttributes="Bold"
+                               FontAttributes="Italic"
                                TextColor="{StaticResource TextPrimaryColor}"
                                Margin="0,10,0,6" />
                     </DataTemplate>

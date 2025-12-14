@@ -3,12 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using FastTrak.Data;
 using FastTrak.Models;
 using Microsoft.Maui.Controls;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FastTrak.ViewModels
 {
@@ -16,32 +11,24 @@ namespace FastTrak.ViewModels
     {
         private readonly NutritionRepository _repo;
 
-        // store the MenuItem ID passed from the MenuItemsPage
         [ObservableProperty]
         private int menuItemId;
 
-        // This holds the visible name of the item (e.g., “Classic Chicken Sandwich”)
         [ObservableProperty]
         private string itemName = string.Empty;
 
-        // Base menu item nutrition (the values before customizations)
         public int BaseCalories { get; set; }
         public decimal BaseProtein { get; set; }
         public decimal BaseCarbs { get; set; }
         public decimal BaseFat { get; set; }
         public int BaseSodium { get; set; }
 
-        // Shown under “Nutrition (Base)” on the UI
         public string BaseNutritionText =>
-            $"{BaseCalories} cal | {BaseProtein}g protein | " +
-            $"{BaseCarbs}g carbs | {BaseFat}g fat | {BaseSodium}mg sodium";
+            $"{BaseCalories} cal | {BaseProtein}g protein | {BaseCarbs}g carbs | {BaseFat}g fat | {BaseSodium}mg sodium";
 
-        // I track quantity → affects final macros
         [ObservableProperty]
         private int quantity = 1;
 
-        // All groups of options that apply to this item
-        // (e.g., Milk Types, Toppings, Sauces, BurgerToppings, etc.)
         public ObservableCollection<OptionGroup> OptionGroups { get; set; } = new();
 
         public CustomizationViewModel(NutritionRepository repo)
@@ -49,120 +36,116 @@ namespace FastTrak.ViewModels
             _repo = repo;
         }
 
-        // extract navigation parameters (MenuItemId)
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             MenuItemId = (int)query["MenuItemId"];
         }
 
-        // MAIN LOAD METHOD — loads base item and attaches appropriate options
         public async Task LoadAsync()
         {
-            // load the base menu item first - figure out what category it belongs to.
             var item = await _repo.GetMenuItemAsync(MenuItemId);
 
-            ItemName = item.Name;
-
+            // Base nutrition values
             BaseCalories = item.Calories;
             BaseProtein = (decimal)item.Protein;
             BaseCarbs = (decimal)item.Carbs;
             BaseFat = (decimal)item.Fat;
             BaseSodium = item.Sodium;
 
-            // load ALL CustomOptions mapped to this MenuItemId.
-            // This returns CustomOption objects, NOT MenuItemOption join rows.
+            ItemName = item.Name;
+            OnPropertyChanged(nameof(ItemName));
+
+            //
+            // FIX: Notify UI of base nutrition values
+            //
+            OnPropertyChanged(nameof(BaseCalories));
+            OnPropertyChanged(nameof(BaseProtein));
+            OnPropertyChanged(nameof(BaseCarbs));
+            OnPropertyChanged(nameof(BaseFat));
+            OnPropertyChanged(nameof(BaseSodium));
+            OnPropertyChanged(nameof(BaseNutritionText));
+
             var allOptions = await _repo.GetCustomOptionsForMenuItemAsync(MenuItemId);
 
-            //  standardize the category for safe comparison.
-            string category = (item.Category ?? "").Trim().ToLower();
+            string category = (item.Category ?? "").Trim().ToLowerInvariant();
 
-            IEnumerable<CustomOption> filteredOptions = allOptions;
+            IEnumerable<CustomOption> filtered = allOptions;
 
-
-            // Sandwiches → only "Topping"
-            if (category == "sandwich" || category == "sandwiches")
+            // CATEGORY FILTERING...
+            switch (category)
             {
-                filteredOptions = allOptions.Where(o =>
-                    (o.Category ?? "").Equals("Topping", StringComparison.OrdinalIgnoreCase));
-            }
-            // Burgers → only "BurgerTopping"
-            else if (category == "burger" || category == "burgers")
-            {
-                filteredOptions = allOptions.Where(o =>
-                    (o.Category ?? "").Equals("BurgerTopping", StringComparison.OrdinalIgnoreCase));
+                case "sandwiches":
+                    filtered = allOptions.Where(o =>
+                        o.Category == "Topping" || o.Category == "Sauce");
+                    break;
+
+                case "burgers":
+                    filtered = allOptions.Where(o =>
+                        o.Category == "BurgerTopping");
+                    break;
+
+                case "potato":
+                    filtered = allOptions.Where(o =>
+                        o.Category == "Potato");
+                    break;
+
+                case "coffee":
+                    filtered = allOptions.Where(o =>
+                        o.Category == "MilkType" ||
+                        o.Category == "Shot" ||
+                        o.Category == "Swirl" ||
+                        o.Category == "Sweetener");
+                    break;
+
+                case "wings":
+                case "desserts":
+                case "donuts":
+                case "breakfast":
+                    filtered = Enumerable.Empty<CustomOption>();
+                    break;
             }
 
-            // ============================
-            // GROUP OPTIONS FOR UI DISPLAY
-            // ============================
-            //
-            // group CustomOptions by their Category ("Topping", "MilkType", etc.)
-            // and convert them into Observable SelectableOption objects.
-            //
-            // Each SelectableOption has a PropertyChanged listener so macros
-            // automatically update when a checkbox is toggled.
-            //
-            // ============================
-
-            var grouped = filteredOptions
+            // GROUP OPTIONS FOR UI
+            var grouped = filtered
                 .GroupBy(o => o.Category)
                 .Select(g =>
                 {
-                    var optionList = new ObservableCollection<SelectableOption>();
+                    var opts = new ObservableCollection<SelectableOption>();
 
                     foreach (var optModel in g)
                     {
                         var opt = new SelectableOption(optModel);
 
-                        // I subscribe to IsSelected changes so totals recalc instantly.
                         opt.PropertyChanged += (s, e) =>
                         {
                             if (e.PropertyName == nameof(SelectableOption.IsSelected))
-                            {
-                                OnPropertyChanged(nameof(TotalNutritionText));
-                                OnPropertyChanged(nameof(TotalCalories));
-                                OnPropertyChanged(nameof(TotalProtein));
-                                OnPropertyChanged(nameof(TotalCarbs));
-                                OnPropertyChanged(nameof(TotalFat));
-                                OnPropertyChanged(nameof(TotalSodium));
-                            }
+                                NotifyTotals();
                         };
 
-                        optionList.Add(opt);
+                        opts.Add(opt);
                     }
 
                     return new OptionGroup
                     {
                         Category = g.Key,
-                        Options = optionList
+                        Options = opts
                     };
                 });
-
-            // ============================
-            // APPLY GROUPS TO VIEW
-            // ============================
 
             OptionGroups.Clear();
             foreach (var group in grouped)
                 OptionGroups.Add(group);
 
-            // I signal to the UI that everything is ready to display.
-            OnPropertyChanged(nameof(BaseNutritionText));
-            OnPropertyChanged(nameof(TotalNutritionText));
+            // Also compute totals once UI is ready
+            NotifyTotals();
         }
 
-
-        // QUANTITY CONTROL BUTTONS
+        // QUANTITY COMMANDS
         [RelayCommand]
         private void IncreaseQuantity()
         {
             Quantity++;
-            OnPropertyChanged(nameof(TotalNutritionText));
-            OnPropertyChanged(nameof(TotalCalories));
-            OnPropertyChanged(nameof(TotalProtein));
-            OnPropertyChanged(nameof(TotalCarbs));
-            OnPropertyChanged(nameof(TotalFat));
-            OnPropertyChanged(nameof(TotalSodium));
+            NotifyTotals();
         }
 
         [RelayCommand]
@@ -171,21 +154,51 @@ namespace FastTrak.ViewModels
             if (Quantity > 1)
             {
                 Quantity--;
-                OnPropertyChanged(nameof(TotalNutritionText));
-                OnPropertyChanged(nameof(TotalCalories));
-                OnPropertyChanged(nameof(TotalProtein));
-                OnPropertyChanged(nameof(TotalCarbs));
-                OnPropertyChanged(nameof(TotalFat));
-                OnPropertyChanged(nameof(TotalSodium));
+                NotifyTotals();
             }
         }
 
-
-        // ADD TO LOG — freezes final nutrition values for use on Home & Calculator pages
+        // ADD ITEM + CUSTOMIZATIONS
         [RelayCommand]
         private async Task AddToLog()
         {
-            //  freeze the *calculated final macros* into LoggedItem override fields
+            //
+            // 1. Compute PER-UNIT nutrition (base item + selected option
+
+            int perUnitCalories =
+                BaseCalories +
+                OptionGroups.SelectMany(g => g.Options)
+                            .Where(o => o.IsSelected)
+                            .Sum(o => o.Calories);
+
+            decimal perUnitProtein =
+                BaseProtein +
+                OptionGroups.SelectMany(g => g.Options)
+                            .Where(o => o.IsSelected)
+                            .Sum(o => o.Protein);
+
+            decimal perUnitCarbs =
+                BaseCarbs +
+                OptionGroups.SelectMany(g => g.Options)
+                            .Where(o => o.IsSelected)
+                            .Sum(o => o.Carbs);
+
+            decimal perUnitFat =
+                BaseFat +
+                OptionGroups.SelectMany(g => g.Options)
+                            .Where(o => o.IsSelected)
+                            .Sum(o => o.Fat);
+
+            int perUnitSodium =
+                BaseSodium +
+                OptionGroups.SelectMany(g => g.Options)
+                            .Where(o => o.IsSelected)
+                            .Sum(o => o.Sodium);
+
+            //
+            // 2. Create & insert the main LoggedItem with PER-UNIT macros
+            //
+
             var loggedItem = new LoggedItem
             {
                 MenuItemId = MenuItemId,
@@ -193,16 +206,20 @@ namespace FastTrak.ViewModels
                 Quantity = Quantity,
 
                 NameOverride = ItemName,
-                CaloriesOverride = TotalCalories,
-                ProteinOverride = (decimal)TotalProtein,
-                CarbsOverride = (decimal)TotalCarbs,
-                FatOverride = (decimal)TotalFat,
-                SodiumOverride = TotalSodium
+
+                CaloriesOverride = perUnitCalories,
+                ProteinOverride = perUnitProtein,
+                CarbsOverride = perUnitCarbs,
+                FatOverride = perUnitFat,
+                SodiumOverride = perUnitSodium
             };
 
             await _repo.InsertLoggedItemAsync(loggedItem);
 
-            // Save selected customization options for historical accuracy
+            //
+            // 3. Save ALL selected customization options for historical accuracy
+            //
+
             foreach (var group in OptionGroups)
             {
                 foreach (var opt in group.Options.Where(o => o.IsSelected))
@@ -222,17 +239,37 @@ namespace FastTrak.ViewModels
                     await _repo.InsertLoggedItemOptionAsync(loggedOption);
                 }
             }
+
+            //
+            // 4. Confirmation popup for user
+            //
+            await Shell.Current.DisplayAlert(
+                "Added to Tray",
+                $"{ItemName} (Qty {Quantity}) has been added to your calculator.",
+                "OK");
+
+            //
+            // 5. Navigate back to previous page
+            //
+            await Shell.Current.GoToAsync("..");
         }
 
 
-        // -----------------------------
-        // LIVE CALCULATION PROPERTIES
-        // -----------------------------
+        private void NotifyTotals()
+        {
+            OnPropertyChanged(nameof(TotalNutritionText));
+            OnPropertyChanged(nameof(TotalCalories));
+            OnPropertyChanged(nameof(TotalProtein));
+            OnPropertyChanged(nameof(TotalCarbs));
+            OnPropertyChanged(nameof(TotalFat));
+            OnPropertyChanged(nameof(TotalSodium));
+        }
 
+        // NUTRITION CALCULATION
         public int TotalCalories =>
             (BaseCalories +
              OptionGroups.SelectMany(g => g.Options).Where(o => o.IsSelected).Sum(o => o.Calories))
-            * Quantity;
+             * Quantity;
 
         public double TotalProtein =>
             (double)((BaseProtein +
@@ -252,8 +289,7 @@ namespace FastTrak.ViewModels
         public int TotalSodium =>
             (BaseSodium +
              OptionGroups.SelectMany(g => g.Options).Where(o => o.IsSelected).Sum(o => o.Sodium))
-            * Quantity;
-
+             * Quantity;
 
         public string TotalNutritionText =>
             $"{TotalCalories} cal | {TotalProtein}g P | {TotalCarbs}g C | {TotalFat}g F | {TotalSodium}mg Na";

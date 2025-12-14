@@ -52,9 +52,9 @@ namespace FastTrak.Data.Seeds
                 //           DUNKIN (2)
                 // ============================
                 // Base coffee items - users will add milk/sugar/shots as customizations
-                new MenuItem { RestaurantId = 2, Name = "Hot Coffee - Medium", Calories = 5, Protein = 0.0, Carbs = 0.0, Fat = 0.0, Sodium = 10, Category = "Coffee" },
-                new MenuItem { RestaurantId = 2, Name = "Iced Coffee - Medium", Calories = 5, Protein = 0.0, Carbs = 0.0, Fat = 0.0, Sodium = 15, Category = "Coffee" },
-                new MenuItem { RestaurantId = 2, Name = "Cold Brew - Medium", Calories = 5, Protein = 0.0, Carbs = 0.0, Fat = 0.0, Sodium = 15, Category = "Coffee" },
+                new MenuItem { RestaurantId = 2, Name = "Hot Coffee - Medium", Calories = 5, Protein = 0.0, Carbs = 0.0, Fat = 0.0, Sodium = 10, Category = "Beverages" },
+                new MenuItem { RestaurantId = 2, Name = "Iced Coffee - Medium", Calories = 5, Protein = 0.0, Carbs = 0.0, Fat = 0.0, Sodium = 15, Category = "Beverages" },
+                new MenuItem { RestaurantId = 2, Name = "Cold Brew - Medium", Calories = 5, Protein = 0.0, Carbs = 0.0, Fat = 0.0, Sodium = 15, Category = "Beverages" },
 
                 new MenuItem { RestaurantId = 2, Name = "Glazed Donut", Calories = 240, Protein = 4.0, Carbs = 33.0, Fat = 11.0, Sodium = 270, Category = "Donuts" },
                 new MenuItem { RestaurantId = 2, Name = "Chocolate Frosted Donut", Calories = 260, Protein = 4.0, Carbs = 34.0, Fat = 11.0, Sodium = 290, Category = "Donuts" },
