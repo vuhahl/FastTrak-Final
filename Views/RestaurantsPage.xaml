@@ -153,13 +153,15 @@
         <!-- AdMob Banner -->
         <Border Grid.Row="1"
         BackgroundColor="#F3F4F6"
-        HeightRequest="50"
+        HeightRequest="65"
         StrokeThickness="1"
         Stroke="#E5E7EB"
         Padding="10">
-            <admob:MTAdView Grid.Row="1"
-                AdsId="ca-app-pub-3940256099942544/6300978111"
-                HeightRequest="50"/>
+            <Label Text="Ad space reserved. Google AdMob is disabled for now."
+           FontSize="12"
+           TextColor="#555"
+           HorizontalTextAlignment="Center"
+           VerticalTextAlignment="Center" />
         </Border>
 
     </Grid>

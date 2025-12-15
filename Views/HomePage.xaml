@@ -9,13 +9,23 @@
             <!-- App Title -->
             <VerticalStackLayout Spacing="4">
                 <Label Text="FastTrak"
-                       FontSize="36"
+                       FontSize="45"
                        FontAttributes="Bold"
                        TextColor="{StaticResource PrimaryColor}" />
 
                 <Label Text="Track fast-food nutrition in seconds."
-                       FontSize="15"
+                       FontSize="20"
                        TextColor="{StaticResource TextSecondaryColor}" />
+
+                <!-- Motivational Quote -->
+                <Label Text="{Binding MotivationalQuote}"
+                       FontSize="16"
+                       Padding="10"
+                       TextColor="#555"
+                       LineBreakMode="WordWrap"
+                       HorizontalTextAlignment="Center"
+                       Margin="5,5,10,20"/>  
+                
             </VerticalStackLayout>
 
             <!-- Navigation Buttons -->

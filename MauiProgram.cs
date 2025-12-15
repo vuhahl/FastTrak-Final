@@ -1,4 +1,6 @@
-﻿using FastTrak.Data;
+﻿using Android.Gms.Ads;
+using CommunityToolkit.Mvvm;
+using FastTrak.Data;
 using FastTrak.Services;
 using FastTrak.ViewModels;
 using FastTrak.Views;
@@ -6,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Compatibility;
 using Microsoft.Maui.Controls.Compatibility.Hosting;
 using Plugin.MauiMTAdmob;
-using CommunityToolkit.Mvvm;
 using MenuItem = FastTrak.Models.MenuItem;
 
 
@@ -21,6 +22,7 @@ namespace FastTrak
             builder
                 .UseMauiApp<App>()
                 .UseMauiMTAdmob()
+
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
