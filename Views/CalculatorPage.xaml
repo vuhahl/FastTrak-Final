@@ -142,6 +142,7 @@
                                            MaxLines="2"
                                            VerticalOptions="Center"/>
 
+
                                     <Button Grid.Column="1"
                                             Text="✕"
                                             FontSize="18"

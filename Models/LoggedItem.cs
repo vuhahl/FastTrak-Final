@@ -14,6 +14,7 @@ namespace FastTrak.Models
         public int Id { get; set; }
 
         public int MenuItemId { get; set; }
+        public int RestaurantId { get; set; }
 
         // Cloud items will use override fields instead
         public string NameOverride { get; set; }
@@ -40,6 +41,7 @@ namespace FastTrak.Models
                 : NameOverride;
 
         public int DisplayCalories => CaloriesOverride;
+
 
 
     }

@@ -199,9 +199,12 @@ namespace FastTrak.ViewModels
             // 2. Create & insert the main LoggedItem with PER-UNIT macros
             //
 
+            var menuItem = await _repo.GetMenuItemAsync(MenuItemId);
+
             var loggedItem = new LoggedItem
             {
                 MenuItemId = MenuItemId,
+                RestaurantId = menuItem.RestaurantId,
                 LoggedAt = DateTime.Now,
                 Quantity = Quantity,
 
