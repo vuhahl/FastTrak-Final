@@ -1,5 +1,4 @@
-﻿using Android.Gms.Ads;
-using CommunityToolkit.Mvvm;
+﻿using CommunityToolkit.Mvvm;
 using FastTrak.Data;
 using FastTrak.Services;
 using FastTrak.ViewModels;
@@ -8,12 +7,18 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Compatibility;
 using Microsoft.Maui.Controls.Compatibility.Hosting;
 using Plugin.MauiMTAdmob;
-using MenuItem = FastTrak.Models.MenuItem;
 
 
 namespace FastTrak
 {
     public static class MauiProgram
+
+    /// <summary>
+    /// defines What services exist
+    /// What pages exist
+    /// What ViewModels exist
+    ///  dependency injection works
+    /// </summary>
     {
         public static MauiApp CreateMauiApp()
         {
@@ -31,10 +36,10 @@ namespace FastTrak
                 });
 
 
-            // Repository (register ONCE)
+            // Repository (one instance used everywhere to prevent database conflicts)
             builder.Services.AddSingleton<NutritionRepository>();
 
-            // ViewModels
+            // ViewModels - new instances crated when needed, every page gets a viewmodel
             builder.Services.AddTransient<HomeViewModel>();
             builder.Services.AddTransient<RestaurantsViewModel>();
             builder.Services.AddTransient<MenuItemsViewModel>();

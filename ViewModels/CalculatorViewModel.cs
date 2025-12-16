@@ -12,7 +12,7 @@ namespace FastTrak.ViewModels
         private readonly NutritionRepository _repo;
 
         public ObservableCollection<LoggedItem> TodayLoggedItems { get; } =
-    new ObservableCollection<LoggedItem>();
+    new ObservableCollection<LoggedItem>(); //if items change the screen updates automatically
 
 
         [ObservableProperty] private int totalCalories;
@@ -38,7 +38,7 @@ namespace FastTrak.ViewModels
 
         private void RecalculateTotals()
         {
-            TotalCalories = TodayLoggedItems.Sum(i => i.CaloriesOverride * i.Quantity);
+            TotalCalories = TodayLoggedItems.Sum(i => i.CaloriesOverride * i.Quantity); //i is each LoggedItem
             TotalProtein = TodayLoggedItems.Sum(i => i.ProteinOverride * i.Quantity);
             TotalCarbs = TodayLoggedItems.Sum(i => i.CarbsOverride * i.Quantity);
             TotalFat = TodayLoggedItems.Sum(i => i.FatOverride * i.Quantity);

@@ -1,4 +1,5 @@
-﻿using FastTrak.Data.Seeds;
+﻿
+using FastTrak.Data.Seeds;
 using FastTrak.Models;
 using Microsoft.Maui.Graphics;
 using SQLite;
@@ -12,8 +13,13 @@ using MenuItem = FastTrak.Models.MenuItem;
 namespace FastTrak.Data
 {
     public class NutritionRepository
+
+    /// <summary>
+    /// Creates tables
+    /// Inserts data, Retrieves data, Updates data, Deletes data
+    /// </summary>
     {
-        private readonly SQLiteAsyncConnection _db;
+        private readonly SQLiteAsyncConnection _db; //all  db actions go through this
 
         public NutritionRepository()
         {
@@ -108,7 +114,7 @@ namespace FastTrak.Data
         //     DATA-RETRIEVAL METHODS
         // =============================
 
-        public Task<List<Restaurant>> GetRestaurantsAsync()
+        public Task<List<Restaurant>> GetRestaurantsAsync() //get restuarants and order by restuarant name, return the list asyncronously
         {
             return _db.Table<Restaurant>()
                       .OrderBy(r => r.Name)
@@ -116,7 +122,7 @@ namespace FastTrak.Data
         }
 
 
-        public async Task<List<LoggedItem>> GetLoggedItemsForTodayAsync()
+        public async Task<List<LoggedItem>> GetLoggedItemsForTodayAsync() //get logged items for today, loads logged items made today, load custom options (calc page gets todays stuff only)
         {
             var today = DateTime.Today;
 
@@ -137,17 +143,17 @@ namespace FastTrak.Data
 
         public Task<List<MenuItem>> GetMenuItemsForRestaurantAsync(int restaurantId)
         {
-            return _db.Table<MenuItem>()
+            return _db.Table<MenuItem>() //get only the menu items for the selected restaurant
                       .Where(m => m.RestaurantId == restaurantId)
                       .OrderBy(m => m.Name)
                       .ToListAsync();
         }
-        public Task<MenuItem> GetMenuItemAsync(int id) =>
-    _db.Table<MenuItem>().FirstAsync(m => m.Id == id);
+        public Task<MenuItem> GetMenuItemAsync(int id) => //get a single menu item by its id, used by customization page
+        _db.Table<MenuItem>().FirstAsync(m => m.Id == id);
 
-        public Task<int> InsertLoggedItemAsync(LoggedItem item)
+        public Task<int> InsertLoggedItemAsync(LoggedItem item) //insert a new logged item into the db
         {
-            return _db.InsertAsync(item);
+            return _db.InsertAsync(item); //insert the iten with foodname, quantty, calories info into the db
         }
 
         // Update an existing logged item (e.g., after quantity change)
@@ -167,14 +173,14 @@ namespace FastTrak.Data
         // get the custom options for a given menu item
         public async Task<List<CustomOption>> GetCustomOptionsForMenuItemAsync(int menuItemId)
         {
-            var links = await _db.Table<MenuItemOption>()
+            var links = await _db.Table<MenuItemOption>() //bridge. which options are allowed for each menuitem?
                                  .Where(l => l.MenuItemId == menuItemId)
                                  .ToListAsync();
 
             var optionIds = links.Select(l => l.CustomOptionId).ToList();
 
             return await _db.Table<CustomOption>()
-                            .Where(o => optionIds.Contains(o.Id))
+                            .Where(o => optionIds.Contains(o.Id))  //get the ID'S of the options that are linked to the menu item
                             .ToListAsync();
         }
 

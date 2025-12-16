@@ -16,7 +16,7 @@ public partial class HomeViewModel : ObservableObject
     private readonly NutritionRepository _repository;
 
     /// <summary>
-    /// Items logged for today.
+    /// Items logged for today. Buttons to Open ResturantsPage and FatSecretSearchPage.
     /// </summary>
     public ObservableCollection<LoggedItem> TodayLoggedItems { get; } = new();
 
@@ -59,7 +59,7 @@ public partial class HomeViewModel : ObservableObject
         TodayItemCount = TodayLoggedItems.Count;
         RecalculateTotals();
 
-        await Task.Delay(4000);
+        await Task.Delay(3000);
         // Load quote after totals
         await LoadQuoteAsync();
     }
@@ -113,7 +113,7 @@ public partial class HomeViewModel : ObservableObject
     /// </summary>
     private void RecalculateTotals()
     {
-        TotalCalories = TodayLoggedItems.Sum(i => i.CaloriesOverride * i.Quantity);
+        TotalCalories = TodayLoggedItems.Sum(i => i.CaloriesOverride * i.Quantity); //i is each LoggedItem
         TotalProtein = TodayLoggedItems.Sum(i => i.ProteinOverride * i.Quantity);
         TotalCarbs = TodayLoggedItems.Sum(i => i.CarbsOverride * i.Quantity);
         TotalFat = TodayLoggedItems.Sum(i => i.FatOverride * i.Quantity);
@@ -140,74 +140,7 @@ public partial class HomeViewModel : ObservableObject
         await Shell.Current.GoToAsync(nameof(CalculatorPage));
     }
 
-    // ========== Tray Editing Commands ==========
-
-    [RelayCommand]
-    private async Task IncreaseItemQuantityAsync(LoggedItem item)
-    {
-        if (item == null) return;
-
-        // simple +1, per-unit macros stay the same
-        item.Quantity++;
-        await _repository.UpdateLoggedItemAsync(item);
-
-        // count & totals
-        TodayItemCount = TodayLoggedItems.Count;
-        RecalculateTotals();
-    }
-
-    [RelayCommand]
-    private async Task DecreaseItemQuantityAsync(LoggedItem item)
-    {
-        if (item == null) return;
-        if (item.Quantity <= 1) return; // do not go below 1
-
-        item.Quantity--;
-        await _repository.UpdateLoggedItemAsync(item);
-
-        TodayItemCount = TodayLoggedItems.Count;
-        RecalculateTotals();
-    }
-
-    [RelayCommand]
-    private async Task DeleteLoggedItemAsync(LoggedItem item)
-    {
-        if (item == null) return;
-
-        bool confirm = await Shell.Current.DisplayAlert(
-            "Remove Item",
-            $"Remove {item.DisplayName} from today's log?",
-            "Remove",
-            "Cancel");
-
-        if (!confirm) return;
-
-        await _repository.DeleteLoggedItemAsync(item.Id);
-        TodayLoggedItems.Remove(item);
-
-        TodayItemCount = TodayLoggedItems.Count;
-        RecalculateTotals();
-    }
-
-    [RelayCommand]
-    private async Task ClearAllItemsAsync()
-    {
-        if (!TodayLoggedItems.Any()) return;
-
-        bool confirm = await Shell.Current.DisplayAlert(
-            "Clear Today's Log",
-            "This will remove all items in today's log.",
-            "Clear",
-            "Cancel");
-
-        if (!confirm) return;
-
-        await _repository.ClearLoggedItemsForTodayAsync();
-        TodayLoggedItems.Clear();
-
-        TodayItemCount = 0;
-        RecalculateTotals();
-    }
+    
 }
     
 

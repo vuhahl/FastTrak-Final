@@ -3,21 +3,28 @@ using CommunityToolkit.Mvvm.Input;
 using FastTrak.Data;
 using FastTrak.Models;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.Shapes;
 using System.Collections.ObjectModel;
 
 namespace FastTrak.ViewModels
 {
-    public partial class CustomizationViewModel : ObservableObject, IQueryAttributable
+    public partial class CustomizationViewModel : ObservableObject, IQueryAttributable //IQUERY - to receive parameters during navigation (knowing what to load)
+
+    /// <summary>
+    /// Displays base nutrition, Handles custom options
+    /// Calculates totals live, Saves customized items 
+    /// 
+    /// </summary>
     {
         private readonly NutritionRepository _repo;
 
         [ObservableProperty]
         private int menuItemId;
 
-        [ObservableProperty]
+        [ObservableProperty] //OP  is an attribute of MVVM (public property, private variable)
         private string itemName = string.Empty;
 
-        public int BaseCalories { get; set; }
+        public int BaseCalories { get; set; } //nutrition values before customizations
         public decimal BaseProtein { get; set; }
         public decimal BaseCarbs { get; set; }
         public decimal BaseFat { get; set; }
@@ -29,16 +36,16 @@ namespace FastTrak.ViewModels
         [ObservableProperty]
         private int quantity = 1;
 
-        public ObservableCollection<OptionGroup> OptionGroups { get; set; } = new();
+        public ObservableCollection<OptionGroup> OptionGroups { get; set; } = new(); //groups of options for the UI
 
         public CustomizationViewModel(NutritionRepository repo)
         {
             _repo = repo;
         }
 
-        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        public void ApplyQueryAttributes(IDictionary<string, object> query) //Iquery
         {
-            MenuItemId = (int)query["MenuItemId"];
+            MenuItemId = (int)query["MenuItemId"]; //get MenuItemId from navigation parameters
         }
 
         public async Task LoadAsync()
@@ -167,7 +174,7 @@ namespace FastTrak.ViewModels
 
             int perUnitCalories =
                 BaseCalories +
-                OptionGroups.SelectMany(g => g.Options)
+                OptionGroups.SelectMany(g => g.Options) //o = SelectableOption
                             .Where(o => o.IsSelected)
                             .Sum(o => o.Calories);
 
