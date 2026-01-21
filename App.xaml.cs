@@ -1,13 +1,16 @@
-﻿using FastTrak.Data;
-using System.Text;
+using FastTrak.Views;
+
 namespace FastTrak;
 
 public partial class App : Application
 {
-    public App(NutritionRepository repo)
+    public App(LoadingPage loadingPage)
     {
         InitializeComponent();
-        MainPage = new AppShell(); //main navigation container
-        Task.Run(async () => await repo.InitializeAsync()); //Creates tables. Seeds initial data(restaurants, menu items, options), Runs asynchronously so the UI does not freeze
+
+        // Start with LoadingPage which handles database initialization
+        // This ensures the DB is fully seeded BEFORE the user sees the main UI,
+        // preventing race conditions where pages query empty tables
+        MainPage = loadingPage;
     }
 }

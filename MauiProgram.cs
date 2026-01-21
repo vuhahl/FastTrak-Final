@@ -48,6 +48,7 @@ namespace FastTrak
             builder.Services.AddTransient<FatSecretSearchViewModel>();
 
             // Pages
+            builder.Services.AddTransient<LoadingPage>();
             builder.Services.AddTransient<HomePage>();
             builder.Services.AddTransient<RestaurantsPage>();
             builder.Services.AddTransient<MenuItemsPage>();
