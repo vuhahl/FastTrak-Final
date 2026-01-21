@@ -48,9 +48,12 @@ namespace FastTrak.Data
             // Seed menu items from MenuItemSeedData.cs
             await SeedMenuItemsAsync();
 
-            await SeedRestaurantsAsync();
-            await SeedMenuItemsAsync();
+            // Seed customization options (milk types, toppings, etc.)
             await SeedCustomOptionsAsync();
+
+            // Seed junction table linking menu items to their available options
+            // NOTE: This must run AFTER MenuItems and CustomOptions are seeded
+            // because it queries the database to get the actual auto-generated IDs
             await SeedMenuItemOptionsAsync();
         }
 
