@@ -1,6 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<!--
+		TARGET FRAMEWORK STRATEGY:
+		=========================
+		Primary Target: Android (net8.0-android)
+		- Main deployment platform for app store release
+		- Build with: dotnet build -f net8.0-android
+
+		Development Target: Windows (net8.0-windows)
+		- Used for rapid development/testing on Windows PC
+		- Faster iteration than Android emulator
+		- Automatically added when building on Windows
+
+		Future: iOS (net8.0-ios)
+		- Requires macOS to build (not available on Windows)
+		- Options: Mac hardware, GitHub Actions, or cloud Mac services
+		- Add when ready: <TargetFrameworks>$(TargetFrameworks);net8.0-ios</TargetFrameworks>
+		-->
 		<TargetFrameworks>net8.0-android</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
@@ -84,10 +101,12 @@
 	  <MauiXaml Update="Views\RestaurantsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\LoadingPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Controls\" />
 	  <Folder Include="Platforms\Android\Handlers\" />
 	</ItemGroup>
 
