@@ -3,19 +3,24 @@ using CommunityToolkit.Mvvm.Input;
 using FastTrak.Data;
 using FastTrak.Models;
 using FastTrak.Services;
-using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace FastTrak.ViewModels
 {
+    /// <summary>
+    /// Searches external FatSecret API for foods and logs them locally.
+    ///
+    /// DEPENDENCIES:
+    /// - FatSecretService: External API for food search (cloud)
+    /// - IUserLogRepository: Saves logged items (user data → SQLite)
+    /// </summary>
     public partial class FatSecretSearchViewModel : ObservableObject
     {
         private readonly FatSecretService _service;
-        private readonly NutritionRepository _repo;
+        private readonly IUserLogRepository _userLog;
 
         [ObservableProperty]
         private string query = string.Empty;
@@ -29,10 +34,10 @@ namespace FastTrak.ViewModels
         public ObservableCollection<FatSecretFoodSearchItem> Results { get; } =
             new ObservableCollection<FatSecretFoodSearchItem>();
 
-        public FatSecretSearchViewModel(FatSecretService service, NutritionRepository repo)
+        public FatSecretSearchViewModel(FatSecretService service, IUserLogRepository userLog)
         {
             _service = service;
-            _repo = repo;
+            _userLog = userLog;
         }
 
         [RelayCommand]
@@ -122,7 +127,7 @@ namespace FastTrak.ViewModels
                     SodiumOverride = (int)Math.Round(sodium)
                 };
 
-                await _repo.InsertLoggedItemAsync(logged);
+                await _userLog.InsertLoggedItemAsync(logged);
 
                 Debug.WriteLine($"[FatSecret] Added to log: {logged.DisplayName}");
 

@@ -1,6 +1,7 @@
 ﻿
 using FastTrak.Data.Seeds;
 using FastTrak.Models;
+using FastTrak.Services;
 using Microsoft.Maui.Graphics;
 using SQLite;
 using System;
@@ -12,12 +13,23 @@ using MenuItem = FastTrak.Models.MenuItem;
 
 namespace FastTrak.Data
 {
-    public class NutritionRepository
-
     /// <summary>
-    /// Creates tables
-    /// Inserts data, Retrieves data, Updates data, Deletes data
+    /// SQLite-based implementation of data access.
+    ///
+    /// IMPLEMENTS TWO INTERFACES:
+    /// - IUserLogRepository: User's private logged items (stays local forever)
+    /// - IRestaurantDataService: Restaurant/menu data (will migrate to API)
+    ///
+    /// WHY BOTH IN ONE CLASS (for now)?
+    /// During the transition period, we keep one SQLite connection for simplicity.
+    /// After API migration, this class will ONLY implement IUserLogRepository,
+    /// and RestaurantApiService will handle IRestaurantDataService.
+    ///
+    /// SEED DATA NOTE:
+    /// The Seed* methods populate reference data locally. These will be removed
+    /// once the API is live and serving restaurant/menu data.
     /// </summary>
+    public class NutritionRepository : IUserLogRepository, IRestaurantDataService
     {
         private readonly SQLiteAsyncConnection _db; //all  db actions go through this
 

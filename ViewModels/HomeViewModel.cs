@@ -2,18 +2,22 @@
 using CommunityToolkit.Mvvm.Input;
 using FastTrak.Data;
 using FastTrak.Models;
-using FastTrak.Services;
 using FastTrak.Views;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text.Json;
 
-/// <summary>
-/// Loads today's log items + count and handles navigation from Home screen.
-/// </summary>
-public partial class HomeViewModel : ObservableObject
+namespace FastTrak.ViewModels
 {
-    private readonly NutritionRepository _repository;
+    /// <summary>
+    /// Dashboard showing today's logged items, totals, and navigation.
+    ///
+    /// DEPENDENCY: IUserLogRepository only (user data → SQLite)
+    /// The motivational quote comes from an external API (ZenQuotes) via HttpClient.
+    /// </summary>
+    public partial class HomeViewModel : ObservableObject
+    {
+        private readonly IUserLogRepository _userLog;
 
     /// <summary>
     /// Items logged for today. Buttons to Open ResturantsPage and FatSecretSearchPage.
@@ -39,10 +43,10 @@ public partial class HomeViewModel : ObservableObject
     [ObservableProperty] private decimal totalCarbs;
     [ObservableProperty] private decimal totalFat;
 
-    public HomeViewModel(NutritionRepository repository)
-    {
-        _repository = repository;
-    }
+    public HomeViewModel(IUserLogRepository userLog)
+        {
+            _userLog = userLog;
+        }
 
     /// <summary>
     /// Reloads today's log from the database.
@@ -52,7 +56,7 @@ public partial class HomeViewModel : ObservableObject
     {
         TodayLoggedItems.Clear();
 
-        var items = await _repository.GetLoggedItemsForTodayAsync();
+        var items = await _userLog.GetLoggedItemsForTodayAsync();
         foreach (var item in items)
             TodayLoggedItems.Add(item);
 
@@ -141,6 +145,6 @@ public partial class HomeViewModel : ObservableObject
     }
 
     
+    }
 }
-    
 

@@ -3,13 +3,18 @@ using CommunityToolkit.Mvvm.Input;
 using FastTrak.Data;
 using FastTrak.Models;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 
 namespace FastTrak.ViewModels
 {
+    /// <summary>
+    /// Manages today's logged items - view, edit quantity, remove items.
+    ///
+    /// DEPENDENCY: IUserLogRepository only (user data → SQLite)
+    /// This ViewModel has no need for restaurant reference data.
+    /// </summary>
     public partial class CalculatorViewModel : ObservableObject
     {
-        private readonly NutritionRepository _repo;
+        private readonly IUserLogRepository _userLog;
 
         public ObservableCollection<LoggedItem> TodayLoggedItems { get; } =
     new ObservableCollection<LoggedItem>(); //if items change the screen updates automatically
@@ -21,14 +26,14 @@ namespace FastTrak.ViewModels
         [ObservableProperty] private decimal totalFat;
         [ObservableProperty] private int totalSodium;
 
-        public CalculatorViewModel(NutritionRepository repo)
+        public CalculatorViewModel(IUserLogRepository userLog)
         {
-            _repo = repo;
+            _userLog = userLog;
         }
 
         public async Task LoadAsync()
         {
-            var items = await _repo.GetLoggedItemsForTodayAsync();
+            var items = await _userLog.GetLoggedItemsForTodayAsync();
             TodayLoggedItems.Clear();
             foreach (var item in items)
                 TodayLoggedItems.Add(item);
@@ -52,7 +57,7 @@ namespace FastTrak.ViewModels
             if (item == null) return;
 
             item.Quantity++;
-            await _repo.UpdateLoggedItemAsync(item);
+            await _userLog.UpdateLoggedItemAsync(item);
 
             // NEW
             RecalculateTotals();
@@ -67,7 +72,7 @@ namespace FastTrak.ViewModels
             if (item.Quantity > 1)
             {
                 item.Quantity--;
-                await _repo.UpdateLoggedItemAsync(item);
+                await _userLog.UpdateLoggedItemAsync(item);
 
                 // NEW
                 RecalculateTotals();
@@ -90,7 +95,7 @@ namespace FastTrak.ViewModels
 
             if (!confirm) return;
 
-            await _repo.DeleteLoggedItemAsync(item.Id);
+            await _userLog.DeleteLoggedItemAsync(item.Id);
             TodayLoggedItems.Remove(item);
 
             RecalculateTotals();
@@ -107,7 +112,7 @@ namespace FastTrak.ViewModels
 
             if (!confirm) return;
 
-            await _repo.ClearLoggedItemsForTodayAsync();
+            await _userLog.ClearLoggedItemsForTodayAsync();
             TodayLoggedItems.Clear();
             RecalculateTotals();
         }

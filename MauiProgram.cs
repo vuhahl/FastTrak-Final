@@ -11,14 +11,19 @@ using Plugin.MauiMTAdmob;
 
 namespace FastTrak
 {
-    public static class MauiProgram
-
     /// <summary>
-    /// defines What services exist
-    /// What pages exist
-    /// What ViewModels exist
-    ///  dependency injection works
+    /// Application entry point and Dependency Injection (DI) configuration.
+    ///
+    /// WHY DEPENDENCY INJECTION?
+    /// DI allows us to swap implementations without changing ViewModels.
+    /// Example: ViewModels request IRestaurantDataService, not NutritionRepository.
+    /// Today that resolves to SQLite. Tomorrow it resolves to an API client.
+    ///
+    /// REGISTRATION PATTERNS:
+    /// - Singleton: One instance shared app-wide (database connections, HTTP clients)
+    /// - Transient: New instance every time (ViewModels, Pages)
     /// </summary>
+    public static class MauiProgram
     {
         public static MauiApp CreateMauiApp()
         {
@@ -36,8 +41,19 @@ namespace FastTrak
                 });
 
 
-            // Repository (one instance used everywhere to prevent database conflicts)
+            // ===========================================
+            // DATA SERVICES - Singleton for shared state
+            // ===========================================
+
+            // NutritionRepository: Single SQLite connection prevents database conflicts.
+            // Currently implements BOTH interfaces. After API migration, it will only
+            // implement IUserLogRepository, and a new RestaurantApiService handles the rest.
             builder.Services.AddSingleton<NutritionRepository>();
+
+            // Interface registrations - ViewModels depend on these, not concrete classes.
+            // This is the "seam" that allows swapping SQLite for API later.
+            builder.Services.AddSingleton<IUserLogRepository>(sp => sp.GetRequiredService<NutritionRepository>());
+            builder.Services.AddSingleton<IRestaurantDataService>(sp => sp.GetRequiredService<NutritionRepository>());
 
             // ViewModels - new instances crated when needed, every page gets a viewmodel
             builder.Services.AddTransient<HomeViewModel>();

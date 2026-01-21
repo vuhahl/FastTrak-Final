@@ -2,21 +2,24 @@
 using CommunityToolkit.Mvvm.Input;
 using FastTrak.Data;
 using FastTrak.Models;
+using FastTrak.Services;
 using Microsoft.Maui.Controls;
-using Microsoft.Maui.Controls.Shapes;
 using System.Collections.ObjectModel;
 
 namespace FastTrak.ViewModels
 {
-    public partial class CustomizationViewModel : ObservableObject, IQueryAttributable //IQUERY - to receive parameters during navigation (knowing what to load)
-
     /// <summary>
-    /// Displays base nutrition, Handles custom options
-    /// Calculates totals live, Saves customized items 
-    /// 
+    /// Handles menu item customization (toppings, milk types, etc.)
+    /// and logging the final item with selected options.
+    ///
+    /// DEPENDENCIES:
+    /// - IRestaurantDataService: Fetches menu item details and available options (reference data → API)
+    /// - IUserLogRepository: Saves logged items and their options (user data → SQLite)
     /// </summary>
+    public partial class CustomizationViewModel : ObservableObject, IQueryAttributable
     {
-        private readonly NutritionRepository _repo;
+        private readonly IRestaurantDataService _dataService;
+        private readonly IUserLogRepository _userLog;
 
         [ObservableProperty]
         private int menuItemId;
@@ -38,9 +41,10 @@ namespace FastTrak.ViewModels
 
         public ObservableCollection<OptionGroup> OptionGroups { get; set; } = new(); //groups of options for the UI
 
-        public CustomizationViewModel(NutritionRepository repo)
+        public CustomizationViewModel(IRestaurantDataService dataService, IUserLogRepository userLog)
         {
-            _repo = repo;
+            _dataService = dataService;
+            _userLog = userLog;
         }
 
         public void ApplyQueryAttributes(IDictionary<string, object> query) //Iquery
@@ -50,7 +54,7 @@ namespace FastTrak.ViewModels
 
         public async Task LoadAsync()
         {
-            var item = await _repo.GetMenuItemAsync(MenuItemId);
+            var item = await _dataService.GetMenuItemAsync(MenuItemId);
 
             // Base nutrition values
             BaseCalories = item.Calories;
@@ -72,7 +76,7 @@ namespace FastTrak.ViewModels
             OnPropertyChanged(nameof(BaseSodium));
             OnPropertyChanged(nameof(BaseNutritionText));
 
-            var allOptions = await _repo.GetCustomOptionsForMenuItemAsync(MenuItemId);
+            var allOptions = await _dataService.GetCustomOptionsForMenuItemAsync(MenuItemId);
 
             string category = (item.Category ?? "").Trim().ToLowerInvariant();
 
@@ -206,7 +210,7 @@ namespace FastTrak.ViewModels
             // 2. Create & insert the main LoggedItem with PER-UNIT macros
             //
 
-            var menuItem = await _repo.GetMenuItemAsync(MenuItemId);
+            var menuItem = await _dataService.GetMenuItemAsync(MenuItemId);
 
             var loggedItem = new LoggedItem
             {
@@ -224,7 +228,7 @@ namespace FastTrak.ViewModels
                 SodiumOverride = perUnitSodium
             };
 
-            await _repo.InsertLoggedItemAsync(loggedItem);
+            await _userLog.InsertLoggedItemAsync(loggedItem);
 
             //
             // 3. Save ALL selected customization options for historical accuracy
@@ -246,7 +250,7 @@ namespace FastTrak.ViewModels
                         Sodium = opt.Sodium
                     };
 
-                    await _repo.InsertLoggedItemOptionAsync(loggedOption);
+                    await _userLog.InsertLoggedItemOptionAsync(loggedOption);
                 }
             }
 

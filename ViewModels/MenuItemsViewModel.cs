@@ -1,21 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FastTrak.Data;
-using FastTrak.Views;
 using FastTrak.Models;
+using FastTrak.Services;
+using FastTrak.Views;
 using MenuItem = FastTrak.Models.MenuItem;
 
 namespace FastTrak.ViewModels
 {
+    /// <summary>
+    /// Displays menu items for a selected restaurant with category grouping.
+    ///
+    /// DEPENDENCIES:
+    /// - IRestaurantDataService: Fetches menu items (reference data → API)
+    /// - IUserLogRepository: Logs items directly for simple categories (user data → SQLite)
+    /// </summary>
     public partial class MenuItemsViewModel : ObservableObject, IQueryAttributable
     {
-        private readonly NutritionRepository _repository;
+        private readonly IRestaurantDataService _dataService;
+        private readonly IUserLogRepository _userLog;
 
         [ObservableProperty]
         private string restaurantName = string.Empty;
@@ -25,9 +29,10 @@ namespace FastTrak.ViewModels
 
         public ObservableCollection<MenuItem> MenuItems { get; } = new();
 
-        public MenuItemsViewModel(NutritionRepository repository)
+        public MenuItemsViewModel(IRestaurantDataService dataService, IUserLogRepository userLog)
         {
-            _repository = repository;
+            _dataService = dataService;
+            _userLog = userLog;
         }
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -53,7 +58,7 @@ namespace FastTrak.ViewModels
         {
             MenuItems.Clear();
 
-            var items = await _repository.GetMenuItemsForRestaurantAsync(RestaurantId);
+            var items = await _dataService.GetMenuItemsForRestaurantAsync(RestaurantId);
 
             foreach (var m in items)
                 MenuItems.Add(m);
@@ -209,7 +214,7 @@ namespace FastTrak.ViewModels
                 SodiumOverride = item.Sodium
             };
 
-            await _repository.InsertLoggedItemAsync(loggedItem);
+            await _userLog.InsertLoggedItemAsync(loggedItem);
 
             await Shell.Current.DisplayAlert(
                 "Added",
