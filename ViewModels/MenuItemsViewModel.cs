@@ -208,9 +208,9 @@ namespace FastTrak.ViewModels
                 Quantity = 1,
                 NameOverride = item.Name,
                 CaloriesOverride = item.Calories,
-                ProteinOverride = (decimal)item.Protein,
-                CarbsOverride = (decimal)item.Carbs,
-                FatOverride = (decimal)item.Fat,
+                ProteinOverride = item.Protein,
+                CarbsOverride = item.Carbs,
+                FatOverride = item.Fat,
                 SodiumOverride = item.Sodium
             };
 

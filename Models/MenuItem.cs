@@ -18,9 +18,9 @@ namespace FastTrak.Models
 
         public int Calories { get; set; }
 
-        public double Protein { get; set; }
-        public double Carbs { get; set; }
-        public double Fat { get; set; }
+        public decimal Protein { get; set; }
+        public decimal Carbs { get; set; }
+        public decimal Fat { get; set; }
         public int Sodium { get; set; }
 
         // Category (optional)

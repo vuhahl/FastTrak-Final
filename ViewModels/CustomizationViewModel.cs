@@ -58,9 +58,9 @@ namespace FastTrak.ViewModels
 
             // Base nutrition values
             BaseCalories = item.Calories;
-            BaseProtein = (decimal)item.Protein;
-            BaseCarbs = (decimal)item.Carbs;
-            BaseFat = (decimal)item.Fat;
+            BaseProtein = item.Protein;
+            BaseCarbs = item.Carbs;
+            BaseFat = item.Fat;
             BaseSodium = item.Sodium;
 
             ItemName = item.Name;

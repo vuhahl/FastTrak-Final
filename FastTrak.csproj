@@ -75,6 +75,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.2" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
@@ -108,6 +109,14 @@
 
 	<ItemGroup>
 	  <Folder Include="Platforms\Android\Handlers\" />
+	</ItemGroup>
+
+	<!-- Exclude the API project folder - it's a separate project -->
+	<ItemGroup>
+	  <Compile Remove="FastTrak.Api\**" />
+	  <Content Remove="FastTrak.Api\**" />
+	  <EmbeddedResource Remove="FastTrak.Api\**" />
+	  <None Remove="FastTrak.Api\**" />
 	</ItemGroup>
 
 </Project>

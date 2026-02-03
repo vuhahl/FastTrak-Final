@@ -42,18 +42,20 @@ namespace FastTrak
 
 
             // ===========================================
-            // DATA SERVICES - Singleton for shared state
+            // DATA SERVICES
             // ===========================================
 
-            // NutritionRepository: Single SQLite connection prevents database conflicts.
-            // Currently implements BOTH interfaces. After API migration, it will only
-            // implement IUserLogRepository, and a new RestaurantApiService handles the rest.
+            // User logs stay in local SQLite (private data)
             builder.Services.AddSingleton<NutritionRepository>();
-
-            // Interface registrations - ViewModels depend on these, not concrete classes.
-            // This is the "seam" that allows swapping SQLite for API later.
             builder.Services.AddSingleton<IUserLogRepository>(sp => sp.GetRequiredService<NutritionRepository>());
-            builder.Services.AddSingleton<IRestaurantDataService>(sp => sp.GetRequiredService<NutritionRepository>());
+
+            // Restaurant data comes from API (shared/public data)
+            // TODO: Change URL to production API after Azure deployment
+            builder.Services.AddHttpClient<IRestaurantDataService, RestaurantApiService>(client =>
+            {
+                client.BaseAddress = new Uri("http://127.0.0.1:5050");
+                client.Timeout = TimeSpan.FromSeconds(30);
+            });
 
             // ViewModels - new instances crated when needed, every page gets a viewmodel
             builder.Services.AddTransient<HomeViewModel>();
