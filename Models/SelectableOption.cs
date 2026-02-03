@@ -32,11 +32,11 @@ namespace FastTrak.Models
             Name = opt.Name;
             Category = opt.Category;
 
-            Calories = (int)opt.Calories;
-            Protein = (decimal)opt.Protein;
-            Carbs = (decimal)opt.Carbs;
-            Fat = (decimal)opt.Fat;
-            Sodium = (int)opt.Sodium;
+            Calories = opt.Calories;
+            Protein = opt.Protein;
+            Carbs = opt.Carbs;
+            Fat = opt.Fat;
+            Sodium = opt.Sodium;
         }
     }
 }

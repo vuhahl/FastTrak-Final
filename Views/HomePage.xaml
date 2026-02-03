@@ -1,59 +1,119 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="FastTrak.Views.HomePage"
-             Title="HomePage">
-    <Grid RowDefinitions="Auto, Auto, Auto, Auto"
-          Padding="24"
-          RowSpacing="20">
+             x:Class="FastTrak.Views.HomePage">
 
-        <!-- App Title -->
-        <VerticalStackLayout Grid.Row="0" Spacing="4">
-            <Label Text="FastTrak"
-                   FontSize="36"
-                   FontAttributes="Bold"
-                   TextColor="{StaticResource Primary}" />
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="20">
 
-            <Label Text="Track fast-food nutrition in seconds."
-                   FontSize="15"
-                   TextColor="{StaticResource TextSecondaryColor}" />
-        </VerticalStackLayout>
-
-        <!-- Daily Log Card -->
-        <Frame Grid.Row="1"
-               Padding="18"
-               BackgroundColor="{StaticResource SurfaceColor}"
-               CornerRadius="18"
-               HasShadow="False">
-            <VerticalStackLayout Spacing="6">
-
-                <Label Text="Today's Log"
-                       FontSize="18"
+            <!-- App Title -->
+            <VerticalStackLayout Spacing="4">
+                <Label Text="FastTrak"
+                       FontSize="45"
                        FontAttributes="Bold"
-                       TextColor="{StaticResource TextPrimaryColor}" />
+                       TextColor="{StaticResource PrimaryColor}" />
 
-                <Label Text="{Binding TodayItemCount, StringFormat='{0} items logged'}"
-                       FontSize="15"
-                       TextColor="{StaticResource InfoColor}" />
+                <Label Text="Track fast-food nutrition in seconds."
+                       FontSize="20"
+                       TextColor="{StaticResource TextSecondaryColor}" />
+
+                <!-- Motivational Quote -->
+                <Label Text="{Binding MotivationalQuote}"
+                       FontSize="16"
+                       Padding="10"
+                       TextColor="#555"
+                       LineBreakMode="WordWrap"
+                       HorizontalTextAlignment="Center"
+                       Margin="5,5,10,20"/>  
+                
             </VerticalStackLayout>
-        </Frame>
 
-        <!-- Browse Restaurants -->
-        <Button Grid.Row="2"
-                Text="Browse Restaurants"
-                FontSize="18"
-                Padding="14"
-                Command="{Binding GoToRestaurantsCommand}" />
+            <!-- Navigation Buttons -->
+            <Button Text="Browse Restaurants"
+                    BackgroundColor="{StaticResource SecondaryColor}"
+                    TextColor="White"
+                    FontSize="18"
+                    Padding="14"
+                    CornerRadius="14"
+                    Command="{Binding GoToRestaurantsCommand}" />
 
-        <!-- Nutritionix Search -->
-        <Button Grid.Row="3"
-                Text="Search with Nutritionix"
-                BackgroundColor="{StaticResource InfoColor}"
-                TextColor="White"
-                FontSize="18"
-                Padding="14"
-                Command="{Binding GoToNutritionixSearchCommand}" />
+            <Button Text="Search with FatService"
+                    BackgroundColor="{StaticResource InfoColor}"
+                    TextColor="White"
+                    FontSize="18"
+                    Padding="14"
+                    CornerRadius="14"
+                    Command="{Binding GoToFatSecretSearchCommand}" />
 
-    </Grid>
+            <Button Text="Open Calculator"
+                    BackgroundColor="{StaticResource PrimaryColor}"
+                    TextColor="White"
+                    FontSize="18"
+                    Padding="14"
+                    CornerRadius="14"
+                    Command="{Binding GoToCalculatorCommand}" />
+
+            <!-- Today's Log Summary -->
+            <Frame BackgroundColor="{StaticResource SurfaceColor}"
+                   CornerRadius="20"
+                   Padding="20"
+                   HasShadow="False">
+
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Today's Log"
+                           FontSize="18"
+                           FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimaryColor}" />
+
+                    <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="{Binding TotalCalories}"
+                                   FontSize="22"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource PrimaryColor}" />
+                            <Label Text="Calories"
+                                   FontSize="12"
+                                   TextColor="{StaticResource TextSecondaryColor}" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Column="1" Spacing="2">
+                            <Label Text="{Binding TotalProtein}"
+                                   FontSize="22"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource PrimaryColor}" />
+                            <Label Text="Protein"
+                                   FontSize="12"
+                                   TextColor="{StaticResource TextSecondaryColor}" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Column="2" Spacing="2">
+                            <Label Text="{Binding TotalCarbs}"
+                                   FontSize="22"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource PrimaryColor}" />
+                            <Label Text="Carbs"
+                                   FontSize="12"
+                                   TextColor="{StaticResource TextSecondaryColor}" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Column="3" Spacing="2">
+                            <Label Text="{Binding TotalFat}"
+                                   FontSize="22"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource PrimaryColor}" />
+                            <Label Text="Fat"
+                                   FontSize="12"
+                                   TextColor="{StaticResource TextSecondaryColor}" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <Label Text="{Binding TodayItemCount, StringFormat='{0} items logged'}"
+                           FontSize="13"
+                           TextColor="{StaticResource TextSecondaryColor}" />
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
 
 </ContentPage>

@@ -1,33 +1,34 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using FastTrak.Data;
-using FastTrak.Views;
 using FastTrak.Models;
-using System;
-using System.Collections.Generic;
+using FastTrak.Services;
+using FastTrak.Views;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MenuItem = FastTrak.Models.MenuItem;
 
 namespace FastTrak.ViewModels
 {
+    /// <summary>
+    /// Displays list of restaurants for user selection.
+    ///
+    /// DEPENDENCY: IRestaurantDataService (reference data)
+    /// - Today: SQLite via NutritionRepository
+    /// - Future: REST API via RestaurantApiService
+    /// </summary>
     public partial class RestaurantsViewModel : ObservableObject
     {
-        private readonly NutritionRepository _repository;
+        private readonly IRestaurantDataService _dataService;
 
         public ObservableCollection<Restaurant> Restaurants { get; } = new();
 
-        public RestaurantsViewModel(NutritionRepository repository)
+        public RestaurantsViewModel(IRestaurantDataService dataService)
         {
-            _repository = repository;
+            _dataService = dataService;
         }
 
         public async Task LoadAsync()
         {
             Restaurants.Clear();
-            var items = await _repository.GetRestaurantsAsync();
+            var items = await _dataService.GetRestaurantsAsync();
             foreach (var r in items)
                 Restaurants.Add(r);
         }

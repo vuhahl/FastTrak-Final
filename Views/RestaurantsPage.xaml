@@ -3,36 +3,167 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="FastTrak.Views.RestaurantsPage"
              xmlns:models="clr-namespace:FastTrak.Models"
-             Title="RestaurantsPage">
-    <VerticalStackLayout Padding="16" Spacing="12">
+             xmlns:viewmodels="clr-namespace:FastTrak.ViewModels"
+             xmlns:admob="clr-namespace:Plugin.MauiMTAdmob.Controls;assembly=Plugin.MauiMTAdmob"
+             x:DataType="viewmodels:RestaurantsViewModel">
 
-        <Label Text="Choose a restaurant"
-               FontSize="20"
-               FontAttributes="Bold"
-               TextColor="{StaticResource TextPrimaryColor}" />
+    <Grid RowDefinitions="*,Auto" RowSpacing="0">
 
-        <!-- List of restaurants -->
-        <CollectionView x:Name="RestaurantsCollectionView"
-                        ItemsSource="{Binding Restaurants}"
-                        SelectionMode="Single"
-                        SelectionChanged="RestaurantsCollectionView_SelectionChanged">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:Restaurant">
-                    <!-- Restaurant card -->
-                    <Frame Padding="16"
-                           Margin="0,8"
-                           BackgroundColor="{StaticResource SurfaceColor}"
-                           CornerRadius="12"
-                           HasShadow="False">
-                        <Label Text="{Binding Name}"
+        <!-- MAIN CONTENT -->
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="20" Spacing="24">
+
+                <!-- Header -->
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Select Restaurant"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           TextColor="#1A1A1A" />
+
+                    <Label Text="Choose from top chain restaurants"
+                           FontSize="14"
+                           TextColor="#6B7280" />
+                </VerticalStackLayout>
+
+                <!-- Restaurant List -->
+                <VerticalStackLayout Spacing="16">
+                    <CollectionView x:Name="RestaurantsCollectionView"
+                                    ItemsSource="{Binding Restaurants}"
+                                    SelectionMode="Single"
+                                    SelectionChanged="RestaurantsCollectionView_SelectionChanged">
+
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="16"/>
+                        </CollectionView.ItemsLayout>
+
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Restaurant">
+
+                                <Border BackgroundColor="White"
+                                        StrokeThickness="1"
+                                        Stroke="{StaticResource PrimaryColor}"
+                                        Padding="16">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="16"/>
+                                    </Border.StrokeShape>
+
+                                    <Border.Shadow>
+                                        <Shadow Brush="Black"
+                                        Opacity="0.08"
+                                        Radius="8"
+                                        Offset="0,2"/>  
+                                    </Border.Shadow>
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
+
+                                        <!-- Restaurant Info -->
+                                        <VerticalStackLayout Grid.Column="1" 
+                                                             Spacing="4"
+                                                             VerticalOptions="Center">
+                                            <Label Text="{Binding Name}"
+                                                   FontSize="17"
+                                                   FontAttributes="Bold"
+                                                   TextColor="#1A1A1A"/>
+
+                                            <Label Text="View menu"
+                                                   FontSize="14"
+                                                   TextColor="#6B7280"/>
+                                        </VerticalStackLayout>
+
+                                        <!-- Chevron -->
+                                        <Label Grid.Column="2"
+                                               Text="›"
+                                               FontSize="28"
+                                               TextColor="#D1D5DB"
+                                               VerticalOptions="Center"/>
+                                    </Grid>
+                                </Border>
+
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+
+                    </CollectionView>
+                </VerticalStackLayout>
+
+                <!-- Quick Start Guide -->
+                <Border BackgroundColor="#EFF6FF"
+                        StrokeThickness="1"
+                        Stroke="#DBEAFE"
+                        Padding="20"
+                        Margin="0,8,0,0">
+
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="16"/>
+                    </Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Quick Start Guide"
+                               TextColor="#1E40AF"
                                FontSize="16"
-                               TextColor="{StaticResource TextPrimaryColor}" />
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                               FontAttributes="Bold"/>
 
-    </VerticalStackLayout>
+                        <VerticalStackLayout Spacing="10">
+                            <HorizontalStackLayout Spacing="8">
+                                <Label Text="1."
+                                       TextColor="#3B82F6"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Start"/>
+                                <Label Text="Select a restaurant from the list above"
+                                       TextColor="#1E40AF"
+                                       FontSize="14"
+                                       VerticalOptions="Center"
+                                       FlexLayout.Grow="1"/>
+                            </HorizontalStackLayout>
 
+                            <HorizontalStackLayout Spacing="8">
+                                <Label Text="2."
+                                       TextColor="#3B82F6"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Start"/>
+                                <Label Text="Browse the menu and add items to your tray"
+                                       TextColor="#1E40AF"
+                                       FontSize="14"
+                                       VerticalOptions="Center"
+                                       FlexLayout.Grow="1"/>
+                            </HorizontalStackLayout>
+
+                            <HorizontalStackLayout Spacing="8">
+                                <Label Text="3."
+                                       TextColor="#3B82F6"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Start"/>
+                                <Label Text="View your nutritional totals in My Tray"
+                                       TextColor="#1E40AF"
+                                       FontSize="14"
+                                       VerticalOptions="Center"
+                                       FlexLayout.Grow="1"/>
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+                </Border>
+
+                
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- AdMob Banner -->
+        <Border Grid.Row="1"
+        BackgroundColor="#F3F4F6"
+        HeightRequest="65"
+        StrokeThickness="1"
+        Stroke="#E5E7EB"
+        Padding="10">
+            <Label Text="Ad space reserved. Google AdMob is disabled for now."
+           FontSize="12"
+           TextColor="#555"
+           HorizontalTextAlignment="Center"
+           VerticalTextAlignment="Center" />
+        </Border>
+
+    </Grid>
 
 </ContentPage>

@@ -11,6 +11,7 @@ namespace FastTrak
             Routing.RegisterRoute(nameof(MenuItemsPage), typeof(MenuItemsPage));
             Routing.RegisterRoute(nameof(CustomizationPage), typeof(CustomizationPage));
             Routing.RegisterRoute(nameof(FatSecretSearchPage), typeof(FatSecretSearchPage));
+            Routing.RegisterRoute(nameof(CalculatorPage), typeof(CalculatorPage));
         }
     }
 }

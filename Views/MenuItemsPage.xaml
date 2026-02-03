@@ -2,53 +2,132 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="FastTrak.Views.MenuItemsPage"
-             xmlns:models="clr-namespace:FastTrak.Models"
-             Title="MenuItemsPage">
-    <Grid RowDefinitions="Auto, *" Padding="16">
+             x:Name="MenuItemsPageRoot"
+             Shell.NavBarIsVisible="True"
+             Title="{Binding RestaurantName}">
 
-        <!-- Header -->
-        <Label Text="{Binding RestaurantName}"
-               FontSize="20"
-               FontAttributes="Bold"
-               Grid.Row="0"
-               TextColor="{StaticResource TextPrimaryColor}" />
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="24">
 
-        <!-- Scrollable Menu Items -->
-        <CollectionView Grid.Row="1"
-                        ItemsSource="{Binding MenuItems}"
-                        SelectionMode="Single"
-                        SelectionChanged="MenuItemsCollectionView_SelectionChanged">
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Frame Padding="16"
-                           Margin="0,8"
-                           BackgroundColor="{StaticResource SurfaceColor}"
-                           CornerRadius="12"
-                           HasShadow="False">
+            <CollectionView ItemsSource="{Binding GroupedItems}"
+                            IsGrouped="True"
+                            SelectionMode="None">
 
-                        <VerticalStackLayout Spacing="6">
+                <!-- ========================= -->
+                <!-- GROUP HEADER (Wings, etc) -->
+                <!-- ========================= -->
+                <CollectionView.GroupHeaderTemplate>
+                    <DataTemplate>
+                        <Label Text="{Binding Title}"
+                               FontSize="22"
+                               FontAttributes="Italic"
+                               TextColor="{StaticResource TextPrimaryColor}"
+                               Margin="0,10,0,6" />
+                    </DataTemplate>
+                </CollectionView.GroupHeaderTemplate>
 
-                            <Label Text="{Binding Name}"
-                                   FontSize="16"
-                                   FontAttributes="Bold" />
+                <!-- ========================= -->
+                <!-- MENU ITEM CARD TEMPLATE   -->
+                <!-- ========================= -->
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
 
-                            <Label Text="{Binding Calories, StringFormat='Calories: {0}'}"
-                                   FontSize="14"
-                                   TextColor="{StaticResource TextSecondaryColor}" />
+                        <Frame Margin="0,6"
+                               BackgroundColor="{StaticResource SurfaceColor}"
+                               Padding="16"
+                               CornerRadius="18"
+                               HasShadow="False">
 
-                            
-                            <Button Text="Customize"
-                            BackgroundColor="{StaticResource PrimaryColor}"
-                            TextColor="White"
-                            CommandParameter="{Binding .}"
-                             Clicked="Customize_Clicked" />
+                            <VerticalStackLayout Spacing="10">
 
-                        </VerticalStackLayout>
+                                <!-- Title + CATEGORY -->
+                                <Label Text="{Binding Name}"
+                                       FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource TextPrimaryColor}" />
 
-                    </Frame>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                                <Label Text="{Binding Category}"
+                                       FontSize="12"
+                                       TextColor="{StaticResource TextSecondaryColor}" />
 
-    </Grid>
+                                <!-- MACROS GRID -->
+                                <Grid ColumnDefinitions="*,*,*,*"
+                                      Margin="0,6">
+
+                                    <VerticalStackLayout Spacing="2">
+                                        <Label Text="{Binding Calories}"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimaryColor}" />
+                                        <Label Text="Calories" FontSize="12"
+                                               TextColor="{StaticResource TextSecondaryColor}" />
+                                    </VerticalStackLayout>
+
+                                    <VerticalStackLayout Grid.Column="1">
+                                        <Label Text="{Binding Protein}" FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimaryColor}" />
+                                        <Label Text="Protein" FontSize="12"
+                                               TextColor="{StaticResource TextSecondaryColor}" />
+                                    </VerticalStackLayout>
+
+                                    <VerticalStackLayout Grid.Column="2">
+                                        <Label Text="{Binding Carbs}" FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimaryColor}" />
+                                        <Label Text="Carbs" FontSize="12"
+                                               TextColor="{StaticResource TextSecondaryColor}" />
+                                    </VerticalStackLayout>
+
+                                    <VerticalStackLayout Grid.Column="3">
+                                        <Label Text="{Binding Fat}" FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimaryColor}" />
+                                        <Label Text="Fat" FontSize="12"
+                                               TextColor="{StaticResource TextSecondaryColor}" />
+                                    </VerticalStackLayout>
+
+                                </Grid>
+
+                                <!-- BUTTONS -->
+                                <!-- Customize & Add -->
+                                <Button Text="Customize + Add"
+                                        BackgroundColor="{StaticResource PrimaryColor}"
+                                        TextColor="White"
+                                        CornerRadius="12"
+                                        Command="{Binding BindingContext.SelectMenuItemCommand, Source={x:Reference MenuItemsPageRoot}}"
+                                        CommandParameter="{Binding .}">
+                                    <Button.Triggers>
+                                        <DataTrigger TargetType="Button"
+                                                     Binding="{Binding IsDirectAdd}"
+                                                     Value="True">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
+                                    </Button.Triggers>
+                                </Button>
+
+                                <!-- Direct Add -->
+                                <Button Text="Add to Calculator"
+                                        BackgroundColor="{StaticResource InfoColor}"
+                                        TextColor="Black"
+                                        CornerRadius="12"
+                                        IsVisible="False"
+                                        Command="{Binding BindingContext.AddToLogDirectCommand, Source={x:Reference MenuItemsPageRoot}}"
+                                        CommandParameter="{Binding .}">
+                                    <Button.Triggers>
+                                        <DataTrigger TargetType="Button"
+                                                     Binding="{Binding IsDirectAdd}"
+                                                     Value="True">
+                                            <Setter Property="IsVisible" Value="True" />
+                                        </DataTrigger>
+                                    </Button.Triggers>
+                                </Button>
+
+                            </VerticalStackLayout>
+
+                        </Frame>
+
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

@@ -5,37 +5,33 @@
     xmlns:views="clr-namespace:FastTrak.Views"
     Shell.FlyoutBehavior="Disabled"
     Title="FastTrak">
+    
+    
 
     <TabBar>
 
         <!-- HOME SCREEN -->
-        <ShellContent
+        <ShellContent 
             Title="Home"
+            Icon="home.png"
             ContentTemplate="{DataTemplate views:HomePage}"
             Route="HomePage" />
 
         <!-- RESTAURANTS PAGE -->
         <ShellContent
-            Title="Restaurants"
+            Title="Menu"
+            Icon="menufood.png"
             ContentTemplate="{DataTemplate views:RestaurantsPage}"
             Route="RestaurantsPage" />
 
-        <!-- MENU ITEMS PAGE (not a tab, but must be registered) -->
-        <!-- We DO NOT place this in TabBar because it's a detail page -->
-
-        <!-- CALCULATOR PAGE 
+       
+        <!-- CALCULATOR PAGE -->
         <ShellContent
-            Title="Calculator"
+            Title="My Tray"
+            Icon="calculator.png"
             ContentTemplate="{DataTemplate views:CalculatorPage}"
             Route="CalculatorPage" />
 
-         ABOUT PAGE 
-        <ShellContent
-            Title="About"
-            ContentTemplate="{DataTemplate views:AboutPage}"
-            Route="AboutPage" />
-        
-        -->
 
     </TabBar>
 

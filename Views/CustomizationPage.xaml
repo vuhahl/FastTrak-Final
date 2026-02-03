@@ -76,7 +76,7 @@
                                     <CollectionView.ItemTemplate>
                                         <DataTemplate x:DataType="models:SelectableOption">
 
-                                            <Frame BackgroundColor="{StaticResource BackgroundColor}"
+                                            <Frame BackgroundColor="Beige"
                                                    CornerRadius="8"
                                                    Padding="8"
                                                    Margin="0,6">

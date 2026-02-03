@@ -17,6 +17,23 @@ public partial class RestaurantsPage : ContentPage
     {
         base.OnAppearing();
         await ViewModel.LoadAsync();
+
+        // AdMob Diagnostic
+        System.Diagnostics.Debug.WriteLine("RestaurantsPage: OnAppearing - Checking for AdMob banner");
+
+        // Give the ad time to load
+        await Task.Delay(2000);
+
+        // Check if ad view exists in the visual tree
+        var adView = this.FindByName<Plugin.MauiMTAdmob.Controls.MTAdView>("AdBanner");
+        if (adView != null)
+        {
+            System.Diagnostics.Debug.WriteLine($"AdMob: Banner found, Height={adView.Height}, IsVisible={adView.IsVisible}");
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine("AdMob: Banner NOT found in view hierarchy");
+        }
     }
 
     private void RestaurantsCollectionView_SelectionChanged(object sender, SelectionChangedEventArgs e)

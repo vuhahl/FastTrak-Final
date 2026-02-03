@@ -1,5 +1,7 @@
-﻿using FastTrak.Data.Seeds;
+﻿
+using FastTrak.Data.Seeds;
 using FastTrak.Models;
+using FastTrak.Services;
 using Microsoft.Maui.Graphics;
 using SQLite;
 using System;
@@ -11,14 +13,31 @@ using MenuItem = FastTrak.Models.MenuItem;
 
 namespace FastTrak.Data
 {
-    public class NutritionRepository
+    /// <summary>
+    /// SQLite-based implementation of data access.
+    ///
+    /// IMPLEMENTS TWO INTERFACES:
+    /// - IUserLogRepository: User's private logged items (stays local forever)
+    /// - IRestaurantDataService: Restaurant/menu data (will migrate to API)
+    ///
+    /// WHY BOTH IN ONE CLASS (for now)?
+    /// During the transition period, we keep one SQLite connection for simplicity.
+    /// After API migration, this class will ONLY implement IUserLogRepository,
+    /// and RestaurantApiService will handle IRestaurantDataService.
+    ///
+    /// SEED DATA NOTE:
+    /// The Seed* methods populate reference data locally. These will be removed
+    /// once the API is live and serving restaurant/menu data.
+    /// </summary>
+    public class NutritionRepository : IUserLogRepository, IRestaurantDataService
     {
-        private readonly SQLiteAsyncConnection _db;
+        private readonly SQLiteAsyncConnection _db; //all  db actions go through this
 
         public NutritionRepository()
         {
             var path = Path.Combine(FileSystem.AppDataDirectory, "fasttrak.db3");
             _db = new SQLiteAsyncConnection(path);
+
         }
 
         /// <summary>
@@ -41,9 +60,12 @@ namespace FastTrak.Data
             // Seed menu items from MenuItemSeedData.cs
             await SeedMenuItemsAsync();
 
-            await SeedRestaurantsAsync();
-            await SeedMenuItemsAsync();
+            // Seed customization options (milk types, toppings, etc.)
             await SeedCustomOptionsAsync();
+
+            // Seed junction table linking menu items to their available options
+            // NOTE: This must run AFTER MenuItems and CustomOptions are seeded
+            // because it queries the database to get the actual auto-generated IDs
             await SeedMenuItemOptionsAsync();
         }
 
@@ -107,72 +129,15 @@ namespace FastTrak.Data
         //     DATA-RETRIEVAL METHODS
         // =============================
 
-        public Task<List<Restaurant>> GetRestaurantsAsync()
+        public Task<List<Restaurant>> GetRestaurantsAsync() //get restuarants and order by restuarant name, return the list asyncronously
         {
             return _db.Table<Restaurant>()
                       .OrderBy(r => r.Name)
                       .ToListAsync();
         }
 
-        public Task<int> GetTodaySelectionCountAsync()
-        {
-            var today = DateTime.Today;
 
-            return _db.Table<LoggedItem>()
-                      .Where(x => x.LoggedAt >= today)
-                      .CountAsync();
-        }
-
-        public Task<List<MenuItem>> GetMenuItemsForRestaurantAsync(int restaurantId)
-        {
-            return _db.Table<MenuItem>()
-                      .Where(m => m.RestaurantId == restaurantId)
-                      .OrderBy(m => m.Name)
-                      .ToListAsync();
-        }
-        public Task<MenuItem> GetMenuItemAsync(int id) =>
-    _db.Table<MenuItem>().FirstAsync(m => m.Id == id);
-
-        public Task<int> InsertLoggedItemAsync(LoggedItem item)
-        {
-            return _db.InsertAsync(item);
-        }
-
-        public Task<List<LoggedItem>> GetLoggedItemsForTodayAsync()
-        {
-            var today = DateTime.Today;
-
-            return _db.Table<LoggedItem>()
-                      .Where(x => x.LoggedAt >= today)
-                      .OrderBy(x => x.LoggedAt)
-                      .ToListAsync();
-        }
-
-        // get the custom options for a given menu item
-        public async Task<List<CustomOption>> GetCustomOptionsForMenuItemAsync(int menuItemId)
-        {
-            var links = await _db.Table<MenuItemOption>()
-                                 .Where(l => l.MenuItemId == menuItemId)
-                                 .ToListAsync();
-
-            var optionIds = links.Select(l => l.CustomOptionId).ToList();
-
-            return await _db.Table<CustomOption>()
-                            .Where(o => optionIds.Contains(o.Id))
-                            .ToListAsync();
-        }
-
-        //Insert option logs
-        public Task<int> InsertLoggedItemOptionAsync(int loggedItemId, int optionId) =>
-    _db.InsertAsync(new LoggedItemOption
-    {
-        LoggedItemId = loggedItemId,
-        CustomOptionId = optionId
-    });
-
-
-
-        public async Task ClearTodayAsync()
+        public async Task<List<LoggedItem>> GetLoggedItemsForTodayAsync() //get logged items for today, loads logged items made today, load custom options (calc page gets todays stuff only)
         {
             var today = DateTime.Today;
 
@@ -180,8 +145,77 @@ namespace FastTrak.Data
                                  .Where(x => x.LoggedAt >= today)
                                  .ToListAsync();
 
+            
             foreach (var item in items)
-                await _db.DeleteAsync(item);
+            {
+                item.Options = await _db.Table<LoggedItemOption>()
+                                        .Where(o => o.LoggedItemId == item.Id)
+                                        .ToListAsync();
+            }
+
+            return items;
+        }
+
+        public Task<List<MenuItem>> GetMenuItemsForRestaurantAsync(int restaurantId)
+        {
+            return _db.Table<MenuItem>() //get only the menu items for the selected restaurant
+                      .Where(m => m.RestaurantId == restaurantId)
+                      .OrderBy(m => m.Name)
+                      .ToListAsync();
+        }
+        public Task<MenuItem> GetMenuItemAsync(int id) => //get a single menu item by its id, used by customization page
+        _db.Table<MenuItem>().FirstAsync(m => m.Id == id);
+
+        public Task<int> InsertLoggedItemAsync(LoggedItem item) //insert a new logged item into the db
+        {
+            return _db.InsertAsync(item); //insert the iten with foodname, quantty, calories info into the db
+        }
+
+        // Update an existing logged item (e.g., after quantity change)
+        public Task<int> UpdateLoggedItemAsync(LoggedItem item)
+        {
+            return _db.UpdateAsync(item);
+        }
+
+        // Delete a single logged item
+        public Task<int> DeleteLoggedItemAsync(int id)
+        {
+            return _db.DeleteAsync<LoggedItem>(id);
+        }
+
+        
+
+        // get the custom options for a given menu item
+        public async Task<List<CustomOption>> GetCustomOptionsForMenuItemAsync(int menuItemId)
+        {
+            var links = await _db.Table<MenuItemOption>() //bridge. which options are allowed for each menuitem?
+                                 .Where(l => l.MenuItemId == menuItemId)
+                                 .ToListAsync();
+
+            var optionIds = links.Select(l => l.CustomOptionId).ToList();
+
+            return await _db.Table<CustomOption>()
+                            .Where(o => optionIds.Contains(o.Id))  //get the ID'S of the options that are linked to the menu item
+                            .ToListAsync();
+        }
+
+        //Insert option logs
+
+        //added 12/12 to account for the new LoggedItemOption model and calc customization macros
+        public Task InsertLoggedItemOptionAsync(LoggedItemOption option)
+        {
+            return _db.InsertAsync(option);
+        }
+
+
+
+        public Task<int> ClearLoggedItemsForTodayAsync()
+        {
+            var today = DateTime.Today;
+
+            return _db.Table<LoggedItem>()
+                      .Where(x => x.LoggedAt >= today)
+                      .DeleteAsync();
         }
     }
 }

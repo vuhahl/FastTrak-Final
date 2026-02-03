@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="FastTrak.Views.CalculatorPage"
+             x:Name="CalculatorPageRoot"
+             Title="My Tray"
+             BackgroundColor="#F8F9FA">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- TOP SUMMARY CARD -->
+            <Frame CornerRadius="16"
+                   Padding="21"
+                   HasShadow="True"
+                   BorderColor="Transparent">
+
+                <Frame.Background>
+                    <LinearGradientBrush EndPoint="0,1">
+                        <GradientStop Color="{StaticResource PrimaryColor}" Offset="0.0"/>
+                        <GradientStop Color="{StaticResource InfoColor}" Offset="1.0"/>
+                    </LinearGradientBrush>
+                </Frame.Background>
+
+                <VerticalStackLayout Spacing="18">
+
+                    <!-- Title -->
+                    <Label Text="Today's Totals"
+                           FontSize="25"
+                           HorizontalOptions="Center"
+                           FontAttributes="Bold"
+                           TextColor="White" />
+
+                    <!-- Macro Grid -->
+                    <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="12">
+
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                            <Label Text="{Binding TotalCalories}"
+                                   FontSize="26"
+                                   FontAttributes="Bold"
+                                   TextColor="White" />
+                            <Label Text="Calories"
+                                   FontSize="12"
+                                   TextColor="#FFEFEFEF" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Column="1" Spacing="4" HorizontalOptions="Center">
+                            <Label Text="{Binding TotalProtein, StringFormat='{0:F0}g'}"
+                                   FontSize="26"
+                                   FontAttributes="Bold"
+                                   TextColor="White" />
+                            <Label Text="Protein"
+                                   FontSize="12"
+                                   TextColor="#FFEFEFEF" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Column="2" Spacing="4" HorizontalOptions="Center">
+                            <Label Text="{Binding TotalCarbs, StringFormat='{0:F0}g'}"
+                                   FontSize="26"
+                                   FontAttributes="Bold"
+                                   TextColor="White" />
+                            <Label Text="Carbs"
+                                   FontSize="12"
+                                   TextColor="#FFEFEFEF" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Column="3" Spacing="4" HorizontalOptions="Center">
+                            <Label Text="{Binding TotalFat, StringFormat='{0:F0}g'}"
+                                   FontSize="26"
+                                   FontAttributes="Bold"
+                                   TextColor="White" />
+                            <Label Text="Fat"
+                                   FontSize="12"
+                                   TextColor="#FFEFEFEF" />
+                        </VerticalStackLayout>
+
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Items Header -->
+            <HorizontalStackLayout Spacing="8" Margin="4,0,0,0">
+                <Label Text="My Items"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="#1A1A1A"
+                       VerticalOptions="Center"/>
+                <Label Text="{Binding TodayLoggedItems.Count, StringFormat='({0})'}"
+                       FontSize="16"
+                       TextColor="#6B7280"
+                       VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+
+            <!-- MY TRAY ITEMS -->
+            <CollectionView ItemsSource="{Binding TodayLoggedItems}"
+                            Margin="0">
+
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="40" Spacing="12" HorizontalOptions="Center">
+                        <Label Text="🍽️"
+                               FontSize="48"
+                               HorizontalOptions="Center"/>
+                        <Label Text="Your tray is empty"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center"
+                               TextColor="#6B7280" />
+                        <Label Text="Add items from restaurant menus"
+                               FontSize="14"
+                               HorizontalOptions="Center"
+                               TextColor="#9CA3AF" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+
+                        <Border BackgroundColor="White"
+                                StrokeThickness="0"
+                                Padding="16"
+                                Margin="0,6">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+
+                            <Border.Shadow>
+                                <Shadow Brush="Black"
+                                        Opacity="0.06"
+                                        Radius="6"
+                                        Offset="0,2"/>
+                            </Border.Shadow>
+
+                            <VerticalStackLayout Spacing="12">
+
+                                <!-- Header Row: Name + Remove -->
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="{Binding DisplayName}"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           TextColor="#1A1A1A"
+                                           LineBreakMode="TailTruncation"
+                                           MaxLines="2"
+                                           VerticalOptions="Center"/>
+
+
+                                    <Button Grid.Column="1"
+                                            Text="✕"
+                                            FontSize="18"
+                                            WidthRequest="32"
+                                            HeightRequest="32"
+                                            CornerRadius="16"
+                                            BackgroundColor="Transparent"
+                                            TextColor="#EF4444"
+                                            Padding="0"
+                                            BorderWidth="1"
+                                            BorderColor="#FEE2E2"
+                                            Command="{Binding 
+                                                BindingContext.RemoveItemCommand,
+                                                Source={x:Reference CalculatorPageRoot}}"
+                                            CommandParameter="{Binding .}" />
+                                </Grid>
+
+                                <!-- Macros Display Grid -->
+                                <Grid ColumnDefinitions="*,*,*,*" 
+                                      ColumnSpacing="8"
+                                      Padding="12,8"
+                                      BackgroundColor="#F9FAFB">
+                                    
+
+                                    <!-- Calories -->
+                                    <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
+                                        <Label Text="{Binding CaloriesOverride}"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="#1A1A1A"
+                                               HorizontalOptions="Center"/>
+                                        <Label Text="cal"
+                                               FontSize="11"
+                                               TextColor="#6B7280"
+                                               HorizontalOptions="Center"/>
+                                    </VerticalStackLayout>
+
+                                    <!-- Protein -->
+                                    <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
+                                        <Label Text="{Binding ProteinOverride, StringFormat='{0:F0}g'}"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="#1A1A1A"
+                                               HorizontalOptions="Center"/>
+                                        <Label Text="protein"
+                                               FontSize="11"
+                                               TextColor="#6B7280"
+                                               HorizontalOptions="Center"/>
+                                    </VerticalStackLayout>
+
+                                    <!-- Carbs -->
+                                    <VerticalStackLayout Grid.Column="2" Spacing="2" HorizontalOptions="Center">
+                                        <Label Text="{Binding CarbsOverride, StringFormat='{0:F0}g'}"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="#1A1A1A"
+                                               HorizontalOptions="Center"/>
+                                        <Label Text="carbs"
+                                               FontSize="11"
+                                               TextColor="#6B7280"
+                                               HorizontalOptions="Center"/>
+                                    </VerticalStackLayout>
+
+                                    <!-- Fat -->
+                                    <VerticalStackLayout Grid.Column="3" Spacing="2" HorizontalOptions="Center">
+                                        <Label Text="{Binding FatOverride, StringFormat='{0:F0}g'}"
+                                               FontSize="16"
+                                               FontAttributes="Bold"
+                                               TextColor="#1A1A1A"
+                                               HorizontalOptions="Center"/>
+                                        <Label Text="fat"
+                                               FontSize="11"
+                                               TextColor="#6B7280"
+                                               HorizontalOptions="Center"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+
+                                <!-- Quantity Control Row -->
+                                <HorizontalStackLayout Spacing="16" HorizontalOptions="Center">
+
+                                    <!-- Decrease Button -->
+                                    <Button Text="-"
+                                            WidthRequest="40"
+                                            HeightRequest="40"
+                                            CornerRadius="20"
+                                            BackgroundColor="{StaticResource PrimaryColor}"
+                                            TextColor="White"
+                                            FontSize="20"
+                                            FontAttributes="Bold"
+                                            Padding="0"
+                                            Command="{Binding 
+                                                BindingContext.DecreaseItemQuantityCommand,
+                                                Source={x:Reference CalculatorPageRoot}}"
+                                            CommandParameter="{Binding .}" />
+
+                                    <!-- Quantity Display -->
+                                    <Border BackgroundColor="#F3F4F6"
+                                            StrokeThickness="0"
+                                            Padding="16,8"
+                                            MinimumWidthRequest="60">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="8"/>
+                                        </Border.StrokeShape>
+                                        <Label Text="{Binding Quantity, StringFormat='Qty: {0}'}"
+                                               VerticalOptions="Center"
+                                               HorizontalOptions="Center"
+                                               FontSize="13"
+                                               FontAttributes="Bold"
+                                               TextColor="#1A1A1A" />
+                                    </Border>
+
+                                    <!-- Increase Button -->
+                                    <Button Text="+"
+                                            WidthRequest="40"
+                                            HeightRequest="40"
+                                            CornerRadius="20"
+                                            BackgroundColor="{StaticResource PrimaryColor}"
+                                            TextColor="White"
+                                            FontSize="20"
+                                            FontAttributes="Bold"
+                                            Padding="0"
+                                            Command="{Binding 
+                                                BindingContext.IncreaseItemQuantityCommand,
+                                                Source={x:Reference CalculatorPageRoot}}"
+                                            CommandParameter="{Binding .}" />
+                                </HorizontalStackLayout>
+
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+
+
+            <!-- CLEAR ALL -->
+            <Button Text="Clear Today's Log"
+                    BackgroundColor="{StaticResource InfoColor}"
+                    TextColor="Black"
+                    FontSize="18"
+                    Padding="14"
+                    CornerRadius="14"
+                    Command="{Binding ClearAllCommand}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
